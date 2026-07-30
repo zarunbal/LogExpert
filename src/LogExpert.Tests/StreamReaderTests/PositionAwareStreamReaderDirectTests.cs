@@ -3,6 +3,7 @@ using System.Text;
 
 using LogExpert.Core.Classes.Log.Streamreaders;
 using LogExpert.Core.Entities;
+using LogExpert.Core.Helpers;
 
 using NUnit.Framework;
 
@@ -182,6 +183,21 @@ public class PositionAwareStreamReaderDirectTests
     {
         var text = "Héllo wörld\nCafé résumé\nこんにちは\n";
         ComparePositions(text, Encoding.UTF8);
+    }
+
+    /// <summary>
+    /// GB2312 (issue #688) is the first offered encoding that is neither single-byte nor Unicode: two
+    /// bytes per Chinese character, one per ASCII character, mixed within a line. The direct reader
+    /// advances its byte position by <c>Encoding.GetByteCount</c> over the decoded chars, so a wrong
+    /// assumption there would drift the position from the second line on — and every buffer boundary,
+    /// rollover check and .lxp scroll position is computed from it.
+    /// </summary>
+    [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
+    public void Position_MatchesSystemReader_Gb2312_MixedAsciiAndChinese ()
+    {
+        var text = "2026-07-30 错误: 连接失败\nINFO 启动完成\nplain ascii line\n警告\n";
+        ComparePositions(text, EncodingRegistry.GetEncoding(EncodingRegistry.CODE_PAGE_GB2312));
     }
 
     private static void ComparePositions (string text, Encoding encoding)

@@ -18,6 +18,7 @@ public class EncodingRegistryTests
     [Test]
     [TestCase(1250)]
     [TestCase(1252)]
+    [TestCase(936)]
     public void GetEncoding_LegacyCodePage_Resolves (int codePage)
     {
         var encoding = EncodingRegistry.GetEncoding(codePage);
@@ -30,6 +31,7 @@ public class EncodingRegistryTests
     [TestCase("windows-1252")]
     [TestCase("utf-8")]
     [TestCase("iso-8859-1")]
+    [TestCase("gb2312")]
     public void TryGetEncoding_SupportedName_ReturnsTrueAndEncoding (string name)
     {
         var resolved = EncodingRegistry.TryGetEncoding(name, out var encoding);

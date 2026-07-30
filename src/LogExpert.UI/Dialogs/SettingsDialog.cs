@@ -124,8 +124,8 @@ internal partial class SettingsDialog : Form
     /// <summary>
     /// The encoding the dialog falls back to when the persisted name is unusable — on both the way in
     /// (nothing to select) and the way out (nothing selected). Has to be one of
-    /// <see cref="GetAvailableEncodings"/>, otherwise the combo box shows a blank selection and OK writes
-    /// back a value the list never offered.
+    /// <see cref="EncodingRegistry.OfferedEncodings"/>, otherwise the combo box shows a blank selection
+    /// and OK writes back a value the list never offered.
     /// </summary>
     internal static Encoding FallbackEncoding { get; } = Encoding.UTF8;
 
@@ -696,44 +696,21 @@ internal partial class SettingsDialog : Form
     }
 
     /// <summary>
-    /// Populates the encoding list in the combo box from <see cref="GetAvailableEncodings"/>. The value
-    /// member of the combo box is set to a specific header name defined in the resources.
+    /// Populates the encoding combo box from <see cref="EncodingRegistry.OfferedEncodings"/> — the same
+    /// list the per-file View → Encoding menu is built from. The value member is set to a specific
+    /// header name defined in the resources; WinForms falls back to it for the display text, so each row
+    /// reads as its <see cref="Encoding.HeaderName"/>.
     /// </summary>
     private void FillEncodingList ()
     {
         comboBoxEncoding.Items.Clear();
 
-        foreach (var encoding in GetAvailableEncodings())
+        foreach (var encoding in EncodingRegistry.OfferedEncodings)
         {
             _ = comboBoxEncoding.Items.Add(encoding);
         }
 
         comboBoxEncoding.ValueMember = Resources.SettingsDialog_UI_ComboBox_Encoding_ValueMember_HeaderName;
-    }
-
-    /// <summary>
-    /// The encodings offered as the default encoding: ASCII, ISO-8859-1, UTF-8, Unicode, Windows-1250
-    /// and Windows-1252.
-    /// </summary>
-    /// <remarks>
-    /// Separate from <see cref="FillEncodingList"/> so the offered set can be asserted without building
-    /// the dialog. The selected entry is saved by name and reselected by equality on the next start, so
-    /// every entry has to be resolvable by name (which is why the code pages go through
-    /// <see cref="EncodingRegistry"/>) and no two entries may share a code page — <c>Encoding.Default</c>
-    /// is deliberately absent because it is code page 65001 just like <see cref="Encoding.UTF8"/>,
-    /// differing only in the BOM it emits, which a read-side default encoding never uses.
-    /// </remarks>
-    internal static IReadOnlyList<Encoding> GetAvailableEncodings ()
-    {
-        return
-        [
-            Encoding.ASCII,
-            Encoding.Latin1,
-            Encoding.UTF8,
-            Encoding.Unicode,
-            EncodingRegistry.GetEncoding(1250),
-            EncodingRegistry.GetEncoding(1252)
-        ];
     }
 
     /// <summary>

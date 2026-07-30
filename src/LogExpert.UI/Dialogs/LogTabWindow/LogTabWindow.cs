@@ -141,13 +141,11 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             BackColor = Color.FromKnownColor(KnownColor.Transparent)
         };
 
-        var index = buttonToolStrip.Items.IndexOfKey("toolStripButtonTail");
+        // Built here rather than declared in the designer so the menu and the Preferences combo box
+        // cannot offer different encodings.
+        EncodingMenuBuilder.Fill(encodingToolStripMenuItem, OnEncodingToolStripMenuItemClick);
 
-        encodingASCIIToolStripMenuItem.Text = Encoding.ASCII.HeaderName;
-        encodingANSIToolStripMenuItem.Text = Encoding.Default.HeaderName;
-        encodingISO88591toolStripMenuItem.Text = Encoding.GetEncoding("iso-8859-1").HeaderName;
-        encodingUTF8toolStripMenuItem.Text = Encoding.UTF8.HeaderName;
-        encodingUTF16toolStripMenuItem.Text = Encoding.Unicode.HeaderName;
+        var index = buttonToolStrip.Items.IndexOfKey("toolStripButtonTail");
 
         if (index != -1)
         {
@@ -451,12 +449,9 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         jumpToPrevToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_jumpToPrevToolStripMenuItem;
         showBookmarkListToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_showBookmarkListToolStripMenuItem;
         columnFinderToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_columnFinderToolStripMenuItem;
+        // The rows below it are labelled with their encoding's header name, not from resources — an
+        // encoding name is the same in every language.
         encodingToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_encodingToolStripMenuItem;
-        encodingASCIIToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_encodingASCIIToolStripMenuItem;
-        encodingANSIToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_encodingANSIToolStripMenuItem;
-        encodingISO88591toolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_encodingISO88591toolStripMenuItem;
-        encodingUTF8toolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_encodingUTF8toolStripMenuItem;
-        encodingUTF16toolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_encodingUTF16toolStripMenuItem;
         timeshiftToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_timeshiftToolStripMenuItem;
         timeshiftToolStripTextBox.Text = Resources.LogTabWindow_UI_ToolStripTextBox_timeshiftToolStripTextBox;
         copyMarkedLinesIntoNewTabToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_copyMarkedLinesIntoNewTabToolStripMenuItem;
@@ -2172,34 +2167,19 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         CurrentLogWindow?.JumpPrevBookmark();
     }
 
+    /// <summary>
+    /// One handler for every row of the Encoding menu: the clicked row carries the encoding it stands
+    /// for, so this does not know which encodings are offered.
+    /// </summary>
     [SupportedOSPlatform("windows")]
-    private void OnASCIIToolStripMenuItemClick (object sender, EventArgs e)
+    private void OnEncodingToolStripMenuItemClick (object sender, EventArgs e)
     {
-        CurrentLogWindow?.ChangeEncoding(Encoding.ASCII);
-    }
+        var encoding = EncodingMenuBuilder.EncodingOf(sender as ToolStripItem);
 
-    [SupportedOSPlatform("windows")]
-    private void OnANSIToolStripMenuItemClick (object sender, EventArgs e)
-    {
-        CurrentLogWindow?.ChangeEncoding(Encoding.Default);
-    }
-
-    [SupportedOSPlatform("windows")]
-    private void OnUTF8ToolStripMenuItemClick (object sender, EventArgs e)
-    {
-        CurrentLogWindow?.ChangeEncoding(new UTF8Encoding(false));
-    }
-
-    [SupportedOSPlatform("windows")]
-    private void OnUTF16ToolStripMenuItemClick (object sender, EventArgs e)
-    {
-        CurrentLogWindow?.ChangeEncoding(Encoding.Unicode);
-    }
-
-    [SupportedOSPlatform("windows")]
-    private void OnISO88591ToolStripMenuItemClick (object sender, EventArgs e)
-    {
-        CurrentLogWindow?.ChangeEncoding(Encoding.GetEncoding("iso-8859-1"));
+        if (encoding != null)
+        {
+            CurrentLogWindow?.ChangeEncoding(encoding);
+        }
     }
 
     [SupportedOSPlatform("windows")]

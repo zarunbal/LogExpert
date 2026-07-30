@@ -36,12 +36,9 @@ internal sealed class MenuToolbarController : IMenuToolbarController
     private ToolStripMenuItem _cellSelectMenuItem;
     private ToolStripMenuItem _columnFinderMenuItem;
 
-    // Encoding menu items
-    private ToolStripMenuItem _encodingAsciiMenuItem;
-    private ToolStripMenuItem _encodingAnsiMenuItem;
-    private ToolStripMenuItem _encodingUtf8MenuItem;
-    private ToolStripMenuItem _encodingUtf16MenuItem;
-    private ToolStripMenuItem _encodingIso88591MenuItem;
+    // The Encoding dropdown. Its rows are built by EncodingMenuBuilder and carry the encoding they
+    // stand for, so this controller never names an individual encoding.
+    private ToolStripMenuItem _encodingMenuItem;
 
     // Toolbar items
     private ToolStripButton _bubblesButton;
@@ -94,11 +91,7 @@ internal sealed class MenuToolbarController : IMenuToolbarController
         _columnFinderMenuItem = FindMenuItem("columnFinderToolStripMenuItem");
 
         // Encoding menu items
-        _encodingAsciiMenuItem = FindMenuItem("encodingASCIIToolStripMenuItem");
-        _encodingAnsiMenuItem = FindMenuItem("encodingANSIToolStripMenuItem");
-        _encodingUtf8MenuItem = FindMenuItem("encodingUTF8toolStripMenuItem");
-        _encodingUtf16MenuItem = FindMenuItem("encodingUTF16toolStripMenuItem");
-        _encodingIso88591MenuItem = FindMenuItem("encodingISO88591toolStripMenuItem");
+        _encodingMenuItem = FindMenuItem("encodingToolStripMenuItem");
 
         // Toolbar items
         _bubblesButton = FindToolStripItem<ToolStripButton>(_buttonToolbar, "toolStripButtonBubbles");
@@ -198,41 +191,26 @@ internal sealed class MenuToolbarController : IMenuToolbarController
             return;
         }
 
-        // Clear all checks
-        SetCheckedSafe(_encodingAsciiMenuItem, false);
-        SetCheckedSafe(_encodingAnsiMenuItem, false);
-        SetCheckedSafe(_encodingUtf8MenuItem, false);
-        SetCheckedSafe(_encodingUtf16MenuItem, false);
-        SetCheckedSafe(_encodingIso88591MenuItem, false);
-
-        if (currentEncoding == null)
+        if (_encodingMenuItem == null)
         {
             return;
         }
 
-        if (currentEncoding is ASCIIEncoding)
-        {
-            SetCheckedSafe(_encodingAsciiMenuItem, true);
-        }
-        else if (currentEncoding.Equals(Encoding.Default))
-        {
-            SetCheckedSafe(_encodingAnsiMenuItem, true);
-        }
-        else if (currentEncoding is UTF8Encoding)
-        {
-            SetCheckedSafe(_encodingUtf8MenuItem, true);
-        }
-        else if (currentEncoding is UnicodeEncoding)
-        {
-            SetCheckedSafe(_encodingUtf16MenuItem, true);
-        }
-        else if (currentEncoding.Equals(Encoding.GetEncoding("iso-8859-1")))
-        {
-            SetCheckedSafe(_encodingIso88591MenuItem, true);
-        }
+        // Matched by code page, not by instance: several Encoding instances stand for the same row —
+        // the menu applies UTF-8 without a BOM, the Preferences default is Encoding.UTF8 with one, and
+        // Encoding.Default (what a file with neither a preamble nor a configured default is read with)
+        // is a third UTF-8 instance. A file read with an encoding the menu does not offer leaves every
+        // row unchecked, which is honest: no offered row would reproduce it.
+        var currentCodePage = currentEncoding?.CodePage;
 
-        // Preserve existing behavior: update ANSI display name
-        _ = (_encodingAnsiMenuItem?.Text = Encoding.Default.HeaderName);
+        foreach (var row in _encodingMenuItem.DropDownItems)
+        {
+            if (row is ToolStripMenuItem encodingRow)
+            {
+                encodingRow.Checked = currentCodePage != null
+                    && EncodingMenuBuilder.EncodingOf(encodingRow)?.CodePage == currentCodePage;
+            }
+        }
     }
 
     public void UpdateHighlightGroups (IEnumerable<string> groups, string selectedGroup)
@@ -409,7 +387,7 @@ internal sealed class MenuToolbarController : IMenuToolbarController
         LogIfNull(_searchMenuItem, "searchToolStripMenuItem");
         LogIfNull(_filterMenuItem, "filterToolStripMenuItem");
         LogIfNull(_timeshiftMenuItem, "timeshiftToolStripMenuItem");
-        LogIfNull(_encodingAsciiMenuItem, "encodingASCIIToolStripMenuItem");
+        LogIfNull(_encodingMenuItem, "encodingToolStripMenuItem");
         LogIfNull(_highlightGroupCombo, "highlightGroupsToolStripComboBox");
         LogIfNull(_lastUsedMenuItem, "lastUsedToolStripMenuItem");
     }

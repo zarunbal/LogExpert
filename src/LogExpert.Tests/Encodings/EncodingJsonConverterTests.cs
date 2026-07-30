@@ -20,6 +20,7 @@ public class EncodingJsonConverterTests
     [Test]
     [TestCase("windows-1250", 1250)]
     [TestCase("windows-1252", 1252)]
+    [TestCase("gb2312", 936)]
     public void ReadJson_LegacyCodePageName_ResolvesInsteadOfFallingBack (string encodingName, int expectedCodePage)
     {
         var encoding = Deserialize($"\"{encodingName}\"");

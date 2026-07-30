@@ -36,6 +36,7 @@ public class PersisterXmlEncodingTests
     [TestCase("windows-1250", 1250)]
     [TestCase("windows-1252", 1252)]
     [TestCase("utf-8", 65001)]
+    [TestCase("gb2312", 936)]
     public void Load_PersistedEncoding_Resolves (string encodingName, int expectedCodePage)
     {
         WriteLxp($"<encoding name=\"{encodingName}\" />");

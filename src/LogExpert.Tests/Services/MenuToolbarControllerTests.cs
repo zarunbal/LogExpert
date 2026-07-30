@@ -4,6 +4,7 @@ using System.Text;
 using System.Windows.Forms;
 
 using LogExpert.Core.EventArguments;
+using LogExpert.Core.Helpers;
 using LogExpert.Dialogs;
 using LogExpert.UI.Controls;
 using LogExpert.UI.Services;
@@ -66,12 +67,10 @@ internal class MenuToolbarControllerTests : IDisposable
         _ = _viewMenu.DropDownItems.Add(new ToolStripMenuItem("Filter") { Name = "filterToolStripMenuItem" });
         _ = _viewMenu.DropDownItems.Add(new ToolStripMenuItem("Column Finder") { Name = "columnFinderToolStripMenuItem" });
 
+        // Filled by the same builder the Log Tab Window uses, so this fixture cannot describe a menu
+        // the application does not actually build.
         _encodingMenu = new ToolStripMenuItem("Encoding") { Name = "encodingToolStripMenuItem" };
-        _ = _encodingMenu.DropDownItems.Add(new ToolStripMenuItem("ASCII") { Name = "encodingASCIIToolStripMenuItem" });
-        _ = _encodingMenu.DropDownItems.Add(new ToolStripMenuItem("ANSI") { Name = "encodingANSIToolStripMenuItem" });
-        _ = _encodingMenu.DropDownItems.Add(new ToolStripMenuItem("UTF-8") { Name = "encodingUTF8toolStripMenuItem" });
-        _ = _encodingMenu.DropDownItems.Add(new ToolStripMenuItem("UTF-16") { Name = "encodingUTF16toolStripMenuItem" });
-        _ = _encodingMenu.DropDownItems.Add(new ToolStripMenuItem("ISO-8859-1") { Name = "encodingISO88591toolStripMenuItem" });
+        EncodingMenuBuilder.Fill(_encodingMenu, (_, _) => { });
         _ = _viewMenu.DropDownItems.Add(_encodingMenu);
 
         var timeshiftMenu = new ToolStripMenuItem("Timeshift") { Name = "timeshiftToolStripMenuItem" };
@@ -156,15 +155,25 @@ internal class MenuToolbarControllerTests : IDisposable
         Assert.That(_dragControl.Visible, Is.False);
     }
 
+    /// <summary>
+    /// Exactly one row is checked, and it is the row for the encoding passed in — asserted for every
+    /// offered encoding, so no row can be unreachable.
+    /// </summary>
     [Test]
-    public void UpdateEncodingMenu_Utf8_ChecksCorrectItem ()
+    public void UpdateEncodingMenu_OfferedEncoding_ChecksOnlyThatRow ()
     {
-        _controller.UpdateEncodingMenu(Encoding.UTF8);
+        Assert.Multiple(() =>
+        {
+            foreach (var encoding in EncodingRegistry.OfferedEncodings)
+            {
+                _controller.UpdateEncodingMenu(encoding);
 
-        var utf8Item = FindMenuItem("encodingUTF8toolStripMenuItem");
-        var asciiItem = FindMenuItem("encodingASCIIToolStripMenuItem");
-        Assert.That(utf8Item.Checked, Is.True);
-        Assert.That(asciiItem.Checked, Is.False);
+                Assert.That(
+                    CheckedEncodingRowNames(),
+                    Is.EqualTo(new[] { EncodingMenuBuilder.RowName(encoding) }).AsCollection,
+                    $"'{encoding.HeaderName}' did not check exactly its own row");
+            }
+        });
     }
 
     [Test]
@@ -175,8 +184,50 @@ internal class MenuToolbarControllerTests : IDisposable
         // Then clear
         _controller.UpdateEncodingMenu(null);
 
-        var utf8Item = FindMenuItem("encodingUTF8toolStripMenuItem");
-        Assert.That(utf8Item.Checked, Is.False);
+        Assert.That(CheckedEncodingRowNames(), Is.Empty);
+    }
+
+    /// <summary>
+    /// A row is identified by its code page, so the UTF-8 instances the application passes around are the
+    /// same row: <see cref="Encoding.UTF8"/> (emits a BOM), a no-BOM instance, and <c>Encoding.Default</c>
+    /// — which is UTF-8 on .NET, and is the reason the "ANSI" row was dropped rather than kept as a
+    /// second, indistinguishable UTF-8 row (issue #688).
+    /// </summary>
+    [Test]
+    public void UpdateEncodingMenu_AnyUtf8Instance_ChecksTheUtf8Row ()
+    {
+        var utf8Row = new[] { EncodingMenuBuilder.RowName(Encoding.UTF8) };
+
+        Assert.Multiple(() =>
+        {
+            foreach (var utf8 in new[] { Encoding.UTF8, new UTF8Encoding(false), Encoding.Default })
+            {
+                _controller.UpdateEncodingMenu(utf8);
+
+                Assert.That(CheckedEncodingRowNames(), Is.EqualTo(utf8Row).AsCollection);
+            }
+        });
+    }
+
+    /// <summary>
+    /// A file read with an encoding the menu does not offer leaves every row unchecked — checking one
+    /// would claim a row reproduces the file's encoding when clicking it would change it.
+    /// </summary>
+    [Test]
+    public void UpdateEncodingMenu_EncodingThatIsNotOffered_ChecksNothing ()
+    {
+        _controller.UpdateEncodingMenu(Encoding.BigEndianUnicode);
+
+        Assert.That(CheckedEncodingRowNames(), Is.Empty);
+    }
+
+    private List<string> CheckedEncodingRowNames ()
+    {
+        return [.. _encodingMenu.DropDownItems
+            .Cast<ToolStripItem>()
+            .OfType<ToolStripMenuItem>()
+            .Where(row => row.Checked)
+            .Select(row => row.Name)];
     }
 
     [Test]

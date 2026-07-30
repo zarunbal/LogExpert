@@ -100,6 +100,35 @@ public class LogfileReaderEncodingTests
         Assert.That(reader.CurrentEncoding.CodePage, Is.EqualTo(Encoding.Default.CodePage));
     }
 
+    /// <summary>
+    /// GB2312 (issue #688) end to end: the encoding a user picks in Preferences has to survive down to
+    /// the text the grid shows. A file this size stays in one buffer, so the point of the multi-line
+    /// assertion is the byte position the reader keeps between lines — a variable-width encoding is
+    /// where that drifts.
+    /// </summary>
+    [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
+    public void ReadFiles_Gb2312File_DecodesEveryLine ()
+    {
+        var gb2312 = EncodingRegistry.GetEncoding(EncodingRegistry.CODE_PAGE_GB2312);
+        string[] lines = ["错误: 连接失败", "INFO 启动完成", "plain ascii line", "警告"];
+        File.WriteAllText(_tempFile, string.Join("\n", lines) + "\n", gb2312);
+
+        using var reader = CreateReader(new EncodingOptions { DefaultEncoding = gb2312 });
+        reader.ReadFiles();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(reader.CurrentEncoding.CodePage, Is.EqualTo(EncodingRegistry.CODE_PAGE_GB2312));
+            Assert.That(reader.LineCount, Is.EqualTo(lines.Length));
+
+            for (var lineNum = 0; lineNum < lines.Length; lineNum++)
+            {
+                Assert.That(LineText(reader, lineNum), Is.EqualTo(lines[lineNum]));
+            }
+        });
+    }
+
     [Test]
     public void ChangeEncoding_SwitchesTheReportedEncoding ()
     {

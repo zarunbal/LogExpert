@@ -1324,21 +1324,6 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
   <data name="LogTabWindow_UI_ToolStripMenuItem_encodingToolStripMenuItem" xml:space="preserve">
 		<value>Encoding</value>
 	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_encodingASCIIToolStripMenuItem" xml:space="preserve">
-		<value>ASCII</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_encodingANSIToolStripMenuItem" xml:space="preserve">
-		<value>ANSI</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_encodingISO88591toolStripMenuItem" xml:space="preserve">
-		<value>ISO-8859-1</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_encodingUTF8toolStripMenuItem" xml:space="preserve">
-		<value>UTF8</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_encodingUTF16toolStripMenuItem" xml:space="preserve">
-		<value>Unicode</value>
-	</data>
   <data name="LogTabWindow_UI_ToolStripTextBox_timeshiftToolStripTextBox" xml:space="preserve">
 		<value>+00:00:00.000</value>
 	</data>

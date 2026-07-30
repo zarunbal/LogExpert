@@ -2,6 +2,7 @@ using System.Text;
 
 using LogExpert.Core.Classes.Log.Streamreaders;
 using LogExpert.Core.Entities;
+using LogExpert.Core.Helpers;
 using LogExpert.Core.Interfaces;
 
 using NUnit.Framework;
@@ -292,5 +293,66 @@ public class LogStreamReaderTest
         }
 
         Assert.That(lineCount, Is.EqualTo(expectedLines));
+    }
+
+    /// <summary>
+    /// The legacy reader advances its position per character read, by a per-encoding step
+    /// (<c>GetPosIncPrecomputed</c>). GB2312 (issue #688) is the first offered encoding that is neither
+    /// single-byte nor Unicode — one byte per ASCII character, two per Chinese one — so a step of "1
+    /// byte unless UTF-8 or UTF-16" drifted the position on the first Chinese character and every
+    /// subsequent line started at the wrong offset.
+    /// </summary>
+    [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
+    public void TryReadLine_LegacyReader_Gb2312_TracksTheBytePositionPerLine ()
+    {
+        var gb2312 = EncodingRegistry.GetEncoding(EncodingRegistry.CODE_PAGE_GB2312);
+        string[] lines = ["错误: 连接失败", "INFO 启动完成", "plain ascii", "警告"];
+        var text = string.Join("\n", lines) + "\n";
+
+        using var stream = new MemoryStream(gb2312.GetBytes(text));
+        using var reader = new PositionAwareStreamReaderLegacy(stream, new EncodingOptions { Encoding = gb2312 }, 500);
+
+        var expectedPosition = 0;
+
+        Assert.Multiple(() =>
+        {
+            foreach (var line in lines)
+            {
+                expectedPosition += gb2312.GetByteCount(line + "\n");
+
+                Assert.That(reader.TryReadLine(out var lineMemory), Is.True);
+                Assert.That(lineMemory.Span.ToString(), Is.EqualTo(line));
+                Assert.That(reader.Position, Is.EqualTo(expectedPosition), $"position drifted after '{line}'");
+            }
+        });
+    }
+
+    /// <summary>
+    /// A step of 0 means "measure the character", which is the only correct answer for a variable-width
+    /// encoding. Pinned per offered encoding so a newly offered one cannot silently get a fixed step.
+    /// </summary>
+    [Test]
+    public void GetPosIncPrecomputed_IsAFixedStepOnlyForFixedWidthEncodings ()
+    {
+        Assert.Multiple(() =>
+        {
+            foreach (var encoding in EncodingRegistry.OfferedEncodings)
+            {
+                var step = PositionAwareStreamReaderBase.GetPosIncPrecomputed(encoding);
+
+                if (step != 0)
+                {
+                    Assert.That(
+                        encoding.GetByteCount("a"),
+                        Is.EqualTo(step),
+                        $"'{encoding.HeaderName}' is credited a fixed {step} byte(s) per character");
+                    Assert.That(
+                        encoding.IsSingleByte || encoding is UnicodeEncoding,
+                        Is.True,
+                        $"'{encoding.HeaderName}' is variable-width, so its step has to be measured");
+                }
+            }
+        });
     }
 }
