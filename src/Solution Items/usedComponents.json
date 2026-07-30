@@ -268,7 +268,7 @@
   },
   {
     "PackageId": "System.Security.Cryptography.Xml",
-    "PackageVersion": "10.0.8",
+    "PackageVersion": "10.0.10",
     "PackageProjectUrl": "https://dot.net/",
     "Copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
     "Authors": "Microsoft",
