@@ -54,6 +54,10 @@ internal class FileOperationServiceTests : IDisposable
 
         _settings = new Settings();
         _ = _configManagerMock.Setup(cm => cm.Settings).Returns(_settings);
+        _ = _configManagerMock.Setup(cm => cm.ClearLastOpenFilesList()).Callback(() => _settings.LastOpenFilesList.Clear());
+
+        // Process-wide state: every test starts as if no window has saved its files yet
+        FileOperationService.LastOpenFilesListReplaced = false;
         _ = _pluginRegistryMock.Setup(pr => pr.RegisteredColumnizers).Returns([]);
 
         _factoryCalls = [];
@@ -799,9 +803,6 @@ internal class FileOperationServiceTests : IDisposable
         // Assert — startup files are loaded (via LoadFilesWithOption → AddFileTab)
         Assert.That(_factoryCalls, Has.Count.EqualTo(1));
         Assert.That(_factoryCalls[0].Request.FileName, Is.EqualTo("startup.log"));
-
-        // Last-open files should NOT be loaded
-        _configManagerMock.Verify(cm => cm.ClearLastOpenFilesList(), Times.Never);
     }
 
     [Test]
@@ -818,7 +819,6 @@ internal class FileOperationServiceTests : IDisposable
         Assert.That(_factoryCalls, Has.Count.EqualTo(2));
         Assert.That(_factoryCalls[0].Request.FileName, Is.EqualTo("file1.log"));
         Assert.That(_factoryCalls[1].Request.FileName, Is.EqualTo("file2.log"));
-        _configManagerMock.Verify(cm => cm.ClearLastOpenFilesList(), Times.Once);
     }
 
     [Test]
@@ -850,21 +850,23 @@ internal class FileOperationServiceTests : IDisposable
         // Assert — empty startup array should fall through to last-open-files path
         Assert.That(_factoryCalls, Has.Count.EqualTo(1));
         Assert.That(_factoryCalls[0].Request.FileName, Is.EqualTo("file1.log"));
-        _configManagerMock.Verify(cm => cm.ClearLastOpenFilesList(), Times.Once);
     }
 
     [Test]
-    public void LoadStartupFiles_ClearsLastOpenFilesAfterLoading ()
+    public void LoadStartupFiles_KeepsLastOpenFilesList ()
     {
         // Arrange
         _settings.Preferences.OpenLastFiles = true;
+        _settings.LastOpenFilesList.Add("file1.log");
         var lastOpenFiles = new List<string> { "file1.log" };
 
         // Act
         _sut.LoadStartupFiles(lastOpenFiles, null);
 
-        // Assert
-        _configManagerMock.Verify(cm => cm.ClearLastOpenFilesList(), Times.Once);
+        // Assert — restoring tabs must not empty the persisted list: SaveLastOpenFilesList owns it,
+        // so a crash mid-session still leaves the files to restore next time
+        _configManagerMock.Verify(cm => cm.ClearLastOpenFilesList(), Times.Never);
+        Assert.That(_settings.LastOpenFilesList, Is.EqualTo(new[] { "file1.log" }));
     }
 
     [Test]
@@ -946,6 +948,74 @@ internal class FileOperationServiceTests : IDisposable
     }
 
     [Test]
+    public void SaveLastOpenFilesList_ReplacesStaleEntries ()
+    {
+        // Arrange — a list left over from an earlier session, e.g. because LogExpert was
+        // started with command-line files and so never cleared it during startup
+        _settings.LastOpenFilesList.Add("old1.log");
+        _settings.LastOpenFilesList.Add("old2.log");
+
+        var coordinatorMock = new Mock<ILogWindowCoordinator>();
+        using var normalWindow = new LogWindow(coordinatorMock.Object, "current.log", false, false, _configManagerMock.Object, PluginRegistry.PluginRegistry.Instance);
+        normalWindow.GivenFileName = "current.log";
+
+        _ = _tabControllerMock
+            .Setup(tc => tc.GetAllWindowsFromDockPanel())
+            .Returns(new List<LogWindow> { normalWindow }.AsReadOnly());
+
+        // Act
+        _sut.SaveLastOpenFilesList();
+
+        // Assert — the saved list holds the current tabs only, not the stale ones
+        Assert.That(_settings.LastOpenFilesList, Is.EqualTo(new[] { "current.log" }));
+    }
+
+    [Test]
+    public void SaveLastOpenFilesList_SecondClosingWindow_AppendsToTheFirstWindowsEntries ()
+    {
+        // Arrange — two LogTabWindows of one session, each with its own tab controller but
+        // sharing the config manager
+        _settings.LastOpenFilesList.Add("old.log");
+
+        var coordinatorMock = new Mock<ILogWindowCoordinator>();
+        using var firstWindow = new LogWindow(coordinatorMock.Object, "first.log", false, false, _configManagerMock.Object, PluginRegistry.PluginRegistry.Instance);
+        firstWindow.GivenFileName = "first.log";
+        using var secondWindow = new LogWindow(coordinatorMock.Object, "second.log", false, false, _configManagerMock.Object, PluginRegistry.PluginRegistry.Instance);
+        secondWindow.GivenFileName = "second.log";
+
+        var firstService = CreateServiceForWindows(firstWindow);
+        var secondService = CreateServiceForWindows(secondWindow);
+
+        // Act — the first window to close drops the stale entry, the second one adds to it
+        firstService.SaveLastOpenFilesList();
+        secondService.SaveLastOpenFilesList();
+
+        // Assert
+        Assert.That(_settings.LastOpenFilesList, Is.EqualTo(new[] { "first.log", "second.log" }));
+    }
+
+    [Test]
+    public void SaveLastOpenFilesList_NoFilesToSave_ClearsStaleEntries ()
+    {
+        // Arrange — only a temp file is open, so nothing gets saved
+        _settings.LastOpenFilesList.Add("old1.log");
+
+        var coordinatorMock = new Mock<ILogWindowCoordinator>();
+        using var tempWindow = new LogWindow(coordinatorMock.Object, "temp.log", true, false, _configManagerMock.Object, PluginRegistry.PluginRegistry.Instance);
+        tempWindow.GivenFileName = "temp.log";
+
+        _ = _tabControllerMock
+            .Setup(tc => tc.GetAllWindowsFromDockPanel())
+            .Returns(new List<LogWindow> { tempWindow }.AsReadOnly());
+
+        // Act
+        _sut.SaveLastOpenFilesList();
+
+        // Assert
+        Assert.That(_settings.LastOpenFilesList, Is.Empty);
+    }
+
+    [Test]
     public void AddFileTabDeferred_SetsDoNotAddToDockPanelTrue ()
     {
         // Act
@@ -983,6 +1053,27 @@ internal class FileOperationServiceTests : IDisposable
         Assert.That(_factoryCalls, Has.Count.EqualTo(2));
         Assert.That(_factoryCalls[0].Request.FileName, Is.EqualTo("a.log"));
         Assert.That(_factoryCalls[1].Request.FileName, Is.EqualTo("b.log"));
+    }
+
+    /// <summary>
+    /// Builds a second service on the shared config manager, standing in for another LogTabWindow
+    /// of the same session with its own tab controller.
+    /// </summary>
+    private FileOperationService CreateServiceForWindows (params LogWindow[] windows)
+    {
+        var tabControllerMock = new Mock<ITabController>();
+        _ = tabControllerMock
+            .Setup(tc => tc.GetAllWindowsFromDockPanel())
+            .Returns(windows.ToList().AsReadOnly());
+
+        return new FileOperationService(
+            _configManagerMock.Object,
+            tabControllerMock.Object,
+            _ledServiceMock.Object,
+            _pluginRegistryMock.Object,
+            _factory,
+            () => _clipboardText,
+            (fileName, isSingle) => _projectCallbackCalls.Add((fileName, isSingle)));
     }
 
     public void Dispose ()

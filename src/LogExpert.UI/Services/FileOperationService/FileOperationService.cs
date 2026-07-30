@@ -27,6 +27,14 @@ internal sealed class FileOperationService (
 {
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
+    /// <summary>
+    /// Whether a closing window has already replaced the persisted last-open-files list in this
+    /// process. All LogTabWindows share one list, so the first window to close replaces it — dropping
+    /// entries left over from earlier sessions — and every window closing after it appends, which
+    /// restores a multi-window session as a whole.
+    /// </summary>
+    internal static bool LastOpenFilesListReplaced { get; set; }
+
     private readonly IConfigManager _configManager = configManager;
     private readonly ITabController _tabController = tabController;
     private readonly ILedIndicatorService _ledIndicatorService = ledIndicatorService;
@@ -329,6 +337,15 @@ internal sealed class FileOperationService (
 
     public void SaveLastOpenFilesList ()
     {
+        // Nothing else clears the list, so the first window to close has to replace it: appending
+        // unconditionally would keep entries from earlier sessions and grow the list without
+        // bound. Windows closing after it append, so all of their files are restored.
+        if (!LastOpenFilesListReplaced)
+        {
+            _configManager.ClearLastOpenFilesList();
+            LastOpenFilesListReplaced = true;
+        }
+
         foreach (var logWin in _tabController.GetAllWindowsFromDockPanel().Where(logwin => !logwin.IsTempFile))
         {
             _configManager.Settings.LastOpenFilesList.Add(logWin.GivenFileName);
@@ -349,8 +366,6 @@ internal sealed class FileOperationService (
             {
                 _ = AddFileTab(new FileTabRequest { FileName = name });
             }
-
-            _configManager.ClearLastOpenFilesList();
         }
     }
 }
