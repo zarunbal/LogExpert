@@ -4,6 +4,7 @@ using System.Text;
 using System.Windows.Forms;
 
 using LogExpert.Core.EventArguments;
+using LogExpert.Core.Helpers;
 using LogExpert.Dialogs;
 using LogExpert.UI.Controls;
 using LogExpert.UI.Services;
@@ -68,10 +69,10 @@ internal class MenuToolbarControllerTests : IDisposable
 
         _encodingMenu = new ToolStripMenuItem("Encoding") { Name = "encodingToolStripMenuItem" };
         _ = _encodingMenu.DropDownItems.Add(new ToolStripMenuItem("ASCII") { Name = "encodingASCIIToolStripMenuItem" });
-        _ = _encodingMenu.DropDownItems.Add(new ToolStripMenuItem("ANSI") { Name = "encodingANSIToolStripMenuItem" });
         _ = _encodingMenu.DropDownItems.Add(new ToolStripMenuItem("UTF-8") { Name = "encodingUTF8toolStripMenuItem" });
         _ = _encodingMenu.DropDownItems.Add(new ToolStripMenuItem("UTF-16") { Name = "encodingUTF16toolStripMenuItem" });
         _ = _encodingMenu.DropDownItems.Add(new ToolStripMenuItem("ISO-8859-1") { Name = "encodingISO88591toolStripMenuItem" });
+        _ = _encodingMenu.DropDownItems.Add(new ToolStripMenuItem("GB2312") { Name = "encodingGB2312toolStripMenuItem" });
         _ = _viewMenu.DropDownItems.Add(_encodingMenu);
 
         var timeshiftMenu = new ToolStripMenuItem("Timeshift") { Name = "timeshiftToolStripMenuItem" };
@@ -177,6 +178,55 @@ internal class MenuToolbarControllerTests : IDisposable
 
         var utf8Item = FindMenuItem("encodingUTF8toolStripMenuItem");
         Assert.That(utf8Item.Checked, Is.False);
+    }
+
+    /// <summary>
+    /// GB2312 (issue #688) is a row of its own, and picking it must not leave another row checked.
+    /// </summary>
+    [Test]
+    public void UpdateEncodingMenu_Gb2312_ChecksTheGb2312Item ()
+    {
+        _controller.UpdateEncodingMenu(EncodingRegistry.GetEncoding(EncodingRegistry.CODE_PAGE_GB2312));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(FindMenuItem("encodingGB2312toolStripMenuItem").Checked, Is.True);
+            Assert.That(FindMenuItem("encodingUTF8toolStripMenuItem").Checked, Is.False);
+            Assert.That(FindMenuItem("encodingASCIIToolStripMenuItem").Checked, Is.False);
+        });
+    }
+
+    /// <summary>
+    /// A row is identified by its code page, so the two UTF-8 instances the application passes around —
+    /// <see cref="Encoding.UTF8"/> (BOM) and the no-BOM instance the menu applies — are the same row.
+    /// </summary>
+    [Test]
+    public void UpdateEncodingMenu_Utf8WithoutBom_ChecksTheSameRowAsUtf8 ()
+    {
+        _controller.UpdateEncodingMenu(new UTF8Encoding(false));
+
+        Assert.That(FindMenuItem("encodingUTF8toolStripMenuItem").Checked, Is.True);
+    }
+
+    /// <summary>
+    /// <c>Encoding.Default</c> is UTF-8 on .NET — the reason the "ANSI" row was dropped rather than kept
+    /// as a second, indistinguishable UTF-8 row (issue #688). It has to check the UTF-8 row, because that
+    /// is the encoding a file with no preamble and no configured default is actually read with.
+    /// </summary>
+    [Test]
+    public void UpdateEncodingMenu_EncodingDefault_ChecksTheUtf8Row ()
+    {
+        _controller.UpdateEncodingMenu(Encoding.Default);
+
+        Assert.That(FindMenuItem("encodingUTF8toolStripMenuItem").Checked, Is.True);
+    }
+
+    [Test]
+    public void UpdateEncodingMenu_Iso88591_ChecksTheIso88591Item ()
+    {
+        _controller.UpdateEncodingMenu(Encoding.Latin1);
+
+        Assert.That(FindMenuItem("encodingISO88591toolStripMenuItem").Checked, Is.True);
     }
 
     [Test]

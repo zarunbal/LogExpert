@@ -1350,9 +1350,6 @@ Checked tools will appear in the icon bar. All other tools are available in the 
   <data name="LogTabWindow_UI_ToolStripMenuItem_encodingASCIIToolStripMenuItem" xml:space="preserve">
         <value>ASCII</value>
     </data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_encodingANSIToolStripMenuItem" xml:space="preserve">
-        <value>ANSI</value>
-    </data>
   <data name="LogTabWindow_UI_ToolStripMenuItem_encodingISO88591toolStripMenuItem" xml:space="preserve">
         <value>ISO-8859-1</value>
     </data>
@@ -1361,6 +1358,9 @@ Checked tools will appear in the icon bar. All other tools are available in the 
     </data>
   <data name="LogTabWindow_UI_ToolStripMenuItem_encodingUTF16toolStripMenuItem" xml:space="preserve">
         <value>Unicode</value>
+    </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_encodingGB2312toolStripMenuItem" xml:space="preserve">
+        <value>GB2312</value>
     </data>
   <data name="LogTabWindow_UI_ToolStripTextBox_timeshiftToolStripTextBox" xml:space="preserve">
         <value>+00:00:00.000</value>

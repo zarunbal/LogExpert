@@ -17,6 +17,7 @@ public class SettingsDialogEncodingListTests
     [Test]
     [TestCase(1250, TestName = "GetAvailableEncodings_OffersWindows1250")]
     [TestCase(1252, TestName = "GetAvailableEncodings_OffersWindows1252")]
+    [TestCase(936, TestName = "GetAvailableEncodings_OffersGb2312")]
     public void GetAvailableEncodings_OffersLegacyCodePage (int codePage)
     {
         var encodings = SettingsDialog.GetAvailableEncodings();

@@ -2285,20 +2285,20 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ANSI.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_encodingANSIToolStripMenuItem {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_encodingANSIToolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to ASCII.
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_encodingASCIIToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_encodingASCIIToolStripMenuItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GB2312.
+        /// </summary>
+        public static string LogTabWindow_UI_ToolStripMenuItem_encodingGB2312toolStripMenuItem {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_encodingGB2312toolStripMenuItem", resourceCulture);
             }
         }
         

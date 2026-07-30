@@ -1,4 +1,4 @@
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 using LogExpert.Core.Enums;
 using LogExpert.Dialogs;
 using WeifenLuo.WinFormsUI.Docking;
@@ -59,10 +59,10 @@ namespace LogExpert.UI.Controls.LogTabWindow
             ToolStripSeparator5 = new ToolStripSeparator();
             encodingToolStripMenuItem = new ToolStripMenuItem();
             encodingASCIIToolStripMenuItem = new ToolStripMenuItem();
-            encodingANSIToolStripMenuItem = new ToolStripMenuItem();
             encodingISO88591toolStripMenuItem = new ToolStripMenuItem();
             encodingUTF8toolStripMenuItem = new ToolStripMenuItem();
             encodingUTF16toolStripMenuItem = new ToolStripMenuItem();
+            encodingGB2312toolStripMenuItem = new ToolStripMenuItem();
             ToolStripSeparator6 = new ToolStripSeparator();
             timeshiftToolStripMenuItem = new ToolStripMenuItem();
             timeshiftToolStripTextBox = new ToolStripTextBox();
@@ -438,7 +438,7 @@ namespace LogExpert.UI.Controls.LogTabWindow
             // 
             // encodingToolStripMenuItem
             // 
-            encodingToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { encodingASCIIToolStripMenuItem, encodingANSIToolStripMenuItem, encodingISO88591toolStripMenuItem, encodingUTF8toolStripMenuItem, encodingUTF16toolStripMenuItem });
+            encodingToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { encodingASCIIToolStripMenuItem, encodingISO88591toolStripMenuItem, encodingUTF8toolStripMenuItem, encodingUTF16toolStripMenuItem, encodingGB2312toolStripMenuItem });
             encodingToolStripMenuItem.Name = "encodingToolStripMenuItem";
             encodingToolStripMenuItem.Size = new Size(177, 22);
             encodingToolStripMenuItem.Text = "Encoding";
@@ -451,16 +451,6 @@ namespace LogExpert.UI.Controls.LogTabWindow
             encodingASCIIToolStripMenuItem.Size = new Size(132, 22);
             encodingASCIIToolStripMenuItem.Text = "ASCII";
             encodingASCIIToolStripMenuItem.Click += OnASCIIToolStripMenuItemClick;
-            // 
-            // encodingANSIToolStripMenuItem
-            // 
-            encodingANSIToolStripMenuItem.BackColor = SystemColors.Control;
-            encodingANSIToolStripMenuItem.ForeColor = SystemColors.ControlDarkDark;
-            encodingANSIToolStripMenuItem.Name = "encodingANSIToolStripMenuItem";
-            encodingANSIToolStripMenuItem.Size = new Size(132, 22);
-            encodingANSIToolStripMenuItem.Tag = "";
-            encodingANSIToolStripMenuItem.Text = "ANSI";
-            encodingANSIToolStripMenuItem.Click += OnANSIToolStripMenuItemClick;
             // 
             // encodingISO88591toolStripMenuItem
             // 
@@ -488,6 +478,15 @@ namespace LogExpert.UI.Controls.LogTabWindow
             encodingUTF16toolStripMenuItem.Size = new Size(132, 22);
             encodingUTF16toolStripMenuItem.Text = "Unicode";
             encodingUTF16toolStripMenuItem.Click += OnUTF16ToolStripMenuItemClick;
+            // 
+            // encodingGB2312toolStripMenuItem
+            // 
+            encodingGB2312toolStripMenuItem.BackColor = SystemColors.Control;
+            encodingGB2312toolStripMenuItem.ForeColor = SystemColors.ControlDarkDark;
+            encodingGB2312toolStripMenuItem.Name = "encodingGB2312toolStripMenuItem";
+            encodingGB2312toolStripMenuItem.Size = new Size(132, 22);
+            encodingGB2312toolStripMenuItem.Text = "GB2312";
+            encodingGB2312toolStripMenuItem.Click += OnGB2312ToolStripMenuItemClick;
             // 
             // ToolStripSeparator6
             // 
@@ -1143,9 +1142,9 @@ namespace LogExpert.UI.Controls.LogTabWindow
         private System.Windows.Forms.ToolStripMenuItem jumpToPrevToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem encodingToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem encodingASCIIToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem encodingANSIToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem encodingUTF8toolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem encodingUTF16toolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem encodingGB2312toolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem reloadToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem columnizerToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;

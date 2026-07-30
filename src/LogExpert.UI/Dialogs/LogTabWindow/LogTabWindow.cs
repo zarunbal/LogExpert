@@ -13,6 +13,7 @@ using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
 using LogExpert.Core.Enums;
 using LogExpert.Core.EventArguments;
+using LogExpert.Core.Helpers;
 using LogExpert.Core.Interfaces;
 using LogExpert.Dialogs;
 using LogExpert.UI.Dialogs;
@@ -142,12 +143,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         };
 
         var index = buttonToolStrip.Items.IndexOfKey("toolStripButtonTail");
-
-        encodingASCIIToolStripMenuItem.Text = Encoding.ASCII.HeaderName;
-        encodingANSIToolStripMenuItem.Text = Encoding.Default.HeaderName;
-        encodingISO88591toolStripMenuItem.Text = Encoding.GetEncoding("iso-8859-1").HeaderName;
-        encodingUTF8toolStripMenuItem.Text = Encoding.UTF8.HeaderName;
-        encodingUTF16toolStripMenuItem.Text = Encoding.Unicode.HeaderName;
 
         if (index != -1)
         {
@@ -453,10 +448,10 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         columnFinderToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_columnFinderToolStripMenuItem;
         encodingToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_encodingToolStripMenuItem;
         encodingASCIIToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_encodingASCIIToolStripMenuItem;
-        encodingANSIToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_encodingANSIToolStripMenuItem;
         encodingISO88591toolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_encodingISO88591toolStripMenuItem;
         encodingUTF8toolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_encodingUTF8toolStripMenuItem;
         encodingUTF16toolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_encodingUTF16toolStripMenuItem;
+        encodingGB2312toolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_encodingGB2312toolStripMenuItem;
         timeshiftToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_timeshiftToolStripMenuItem;
         timeshiftToolStripTextBox.Text = Resources.LogTabWindow_UI_ToolStripTextBox_timeshiftToolStripTextBox;
         copyMarkedLinesIntoNewTabToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_copyMarkedLinesIntoNewTabToolStripMenuItem;
@@ -2179,12 +2174,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     [SupportedOSPlatform("windows")]
-    private void OnANSIToolStripMenuItemClick (object sender, EventArgs e)
-    {
-        CurrentLogWindow?.ChangeEncoding(Encoding.Default);
-    }
-
-    [SupportedOSPlatform("windows")]
     private void OnUTF8ToolStripMenuItemClick (object sender, EventArgs e)
     {
         CurrentLogWindow?.ChangeEncoding(new UTF8Encoding(false));
@@ -2199,7 +2188,13 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void OnISO88591ToolStripMenuItemClick (object sender, EventArgs e)
     {
-        CurrentLogWindow?.ChangeEncoding(Encoding.GetEncoding("iso-8859-1"));
+        CurrentLogWindow?.ChangeEncoding(Encoding.Latin1);
+    }
+
+    [SupportedOSPlatform("windows")]
+    private void OnGB2312ToolStripMenuItemClick (object sender, EventArgs e)
+    {
+        CurrentLogWindow?.ChangeEncoding(EncodingRegistry.GetEncoding(EncodingRegistry.CODE_PAGE_GB2312));
     }
 
     [SupportedOSPlatform("windows")]

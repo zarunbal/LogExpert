@@ -28,6 +28,17 @@ namespace LogExpert.Core.Helpers;
 public static class EncodingRegistry
 {
     /// <summary>
+    /// Code page of GB2312, the simplified-Chinese code page (issue #688).
+    /// </summary>
+    /// <remarks>
+    /// Named — unlike the code pages that appear once, as a bare number, at the single place that
+    /// offers them — because three call sites have to agree on it: the Preferences default-encoding
+    /// list, the encoding menu row that applies it, and the check-state lookup that has to recognise a
+    /// file already being read with it.
+    /// </remarks>
+    public const int CODE_PAGE_GB2312 = 936;
+
+    /// <summary>
     /// Registers <see cref="CodePagesEncodingProvider"/> on first use.
     /// </summary>
     /// <remarks>

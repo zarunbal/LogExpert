@@ -312,6 +312,7 @@ internal class FileOperationServiceTests : IDisposable
     [Test]
     [TestCase("windows-1250", 1250)]
     [TestCase("windows-1252", 1252)]
+    [TestCase("gb2312", 936)]
     public void AddFileTab_LegacyCodePageDefaultEncoding_ResolvesWithoutOpeningPreferences (string encodingName, int expectedCodePage)
     {
         // Arrange

@@ -712,8 +712,8 @@ internal partial class SettingsDialog : Form
     }
 
     /// <summary>
-    /// The encodings offered as the default encoding: ASCII, ISO-8859-1, UTF-8, Unicode, Windows-1250
-    /// and Windows-1252.
+    /// The encodings offered as the default encoding: ASCII, ISO-8859-1, UTF-8, Unicode, Windows-1250,
+    /// Windows-1252 and GB2312.
     /// </summary>
     /// <remarks>
     /// Separate from <see cref="FillEncodingList"/> so the offered set can be asserted without building
@@ -722,6 +722,10 @@ internal partial class SettingsDialog : Form
     /// <see cref="EncodingRegistry"/>) and no two entries may share a code page — <c>Encoding.Default</c>
     /// is deliberately absent because it is code page 65001 just like <see cref="Encoding.UTF8"/>,
     /// differing only in the BOM it emits, which a read-side default encoding never uses.
+    /// <para>
+    /// New entries are appended rather than sorted in, so an existing user's row does not move under
+    /// the cursor on upgrade.
+    /// </para>
     /// </remarks>
     internal static IReadOnlyList<Encoding> GetAvailableEncodings ()
     {
@@ -732,7 +736,8 @@ internal partial class SettingsDialog : Form
             Encoding.UTF8,
             Encoding.Unicode,
             EncodingRegistry.GetEncoding(1250),
-            EncodingRegistry.GetEncoding(1252)
+            EncodingRegistry.GetEncoding(1252),
+            EncodingRegistry.GetEncoding(EncodingRegistry.CODE_PAGE_GB2312)
         ];
     }
 
