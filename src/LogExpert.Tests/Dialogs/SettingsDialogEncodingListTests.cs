@@ -8,110 +8,28 @@ using NUnit.Framework;
 namespace LogExpert.Tests.Dialogs;
 
 /// <summary>
-/// The Preferences encoding dropdown is the only way to set <c>Preferences.DefaultEncoding</c>, so the
-/// list is asserted directly — building the dialog is not needed to know what it offers.
+/// The Preferences encoding combo box, which is the only way to set <c>Preferences.DefaultEncoding</c>.
+/// What it offers is <see cref="EncodingRegistry.OfferedEncodings"/> and is asserted in
+/// <c>OfferedEncodingsTests</c>; what is left here is the part only a real
+/// <see cref="ComboBox"/> can answer.
 /// </summary>
 [TestFixture]
 public class SettingsDialogEncodingListTests
 {
-    [Test]
-    [TestCase(1250, TestName = "GetAvailableEncodings_OffersWindows1250")]
-    [TestCase(1252, TestName = "GetAvailableEncodings_OffersWindows1252")]
-    [TestCase(936, TestName = "GetAvailableEncodings_OffersGb2312")]
-    public void GetAvailableEncodings_OffersLegacyCodePage (int codePage)
-    {
-        var encodings = SettingsDialog.GetAvailableEncodings();
-
-        Assert.That(encodings.Select(encoding => encoding.CodePage), Does.Contain(codePage));
-    }
-
     /// <summary>
-    /// Every offered encoding is saved as its name and resolved from that name on the next start, so a
-    /// name that cannot be resolved again would silently degrade to
-    /// <see cref="SettingsDialog.FallbackEncoding"/>.
-    /// </summary>
-    [Test]
-    public void GetAvailableEncodings_EveryEntryResolvesByItsPersistedName ()
-    {
-        var encodings = SettingsDialog.GetAvailableEncodings();
-
-        Assert.Multiple(() =>
-        {
-            foreach (var encoding in encodings)
-            {
-                Assert.That(
-                    EncodingRegistry.TryGetEncoding(encoding.HeaderName, out _),
-                    Is.True,
-                    $"'{encoding.HeaderName}' cannot be resolved back from a saved preference");
-            }
-        });
-    }
-
-    /// <summary>
-    /// The dropdown renders each entry as its <see cref="Encoding.HeaderName"/>, so two entries sharing a
-    /// code page are two rows the user cannot tell apart. <c>Encoding.Default</c> and
-    /// <see cref="Encoding.UTF8"/> are both code page 65001 on .NET and both read <c>utf-8</c>.
-    /// </summary>
-    [Test]
-    public void GetAvailableEncodings_NoTwoEntriesShareACodePage ()
-    {
-        var codePages = SettingsDialog.GetAvailableEncodings().Select(encoding => encoding.CodePage);
-
-        Assert.That(codePages, Is.Unique);
-    }
-
-    /// <summary>
-    /// The selection is persisted by name and restored with
-    /// <c>comboBoxEncoding.SelectedItem = EncodingRegistry.GetEncoding(name, …)</c>. WinForms locates that
-    /// item with <see cref="object.Equals(object)"/>, so an entry whose name resolves back to an instance
-    /// that is not equal to it can never be reselected — the row goes dead after the first restart.
-    /// </summary>
-    [Test]
-    public void GetAvailableEncodings_EveryEntryIsReselectableAfterARoundTrip ()
-    {
-        var encodings = SettingsDialog.GetAvailableEncodings();
-
-        Assert.Multiple(() =>
-        {
-            foreach (var encoding in encodings)
-            {
-                var restored = EncodingRegistry.GetEncoding(encoding.HeaderName, SettingsDialog.FallbackEncoding);
-
-                Assert.That(
-                    restored,
-                    Is.EqualTo(encoding),
-                    $"picking '{encoding.HeaderName}' saves a name that reselects a different entry");
-            }
-        });
-    }
-
-    /// <summary>
-    /// <c>FillDialog</c> and <c>SavePreferences</c> fall back to this encoding when the persisted name is
-    /// unusable, so it has to be an offered entry — otherwise the dropdown shows no selection and OK
-    /// rewrites the preference to something that was never on the list.
-    /// </summary>
-    [Test]
-    public void GetAvailableEncodings_OffersTheFallbackEncoding ()
-    {
-        var encodings = SettingsDialog.GetAvailableEncodings();
-
-        Assert.That(encodings, Does.Contain(SettingsDialog.FallbackEncoding));
-    }
-
-    /// <summary>
-    /// The same round trip against a real <see cref="ComboBox"/>, because the reselect actually goes
-    /// through <c>Items.IndexOf</c> — WinForms, not NUnit, has the final say on whether a row is
-    /// reachable. Deliberately kept alongside the assertion above rather than replacing it: this one
-    /// needs an STA apartment and a WinForms control, and the invariant should still be pinned where
-    /// that is unavailable.
+    /// The persist/restore round trip against a real <see cref="ComboBox"/>, configured the way the
+    /// dialog configures it: the reselect goes through <c>Items.IndexOf</c>, and WinForms — not NUnit —
+    /// has the final say on whether a row is reachable. Deliberately kept alongside the plain assertion
+    /// in <c>OfferedEncodingsTests</c> rather than replacing it: this one needs an STA apartment and a
+    /// WinForms control, and the invariant should still be pinned where that is unavailable.
     /// </summary>
     [Test]
     [Apartment(ApartmentState.STA)]
-    public void GetAvailableEncodings_EveryOfferedRowIsReselectableInARealComboBox ()
+    public void EncodingComboBox_EveryOfferedRowIsReselectableAfterARestart ()
     {
-        var encodings = SettingsDialog.GetAvailableEncodings();
+        var encodings = EncodingRegistry.OfferedEncodings;
 
-        using var comboBox = new ComboBox { FormattingEnabled = true };
+        using var comboBox = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, FormattingEnabled = true };
         comboBox.Items.AddRange([.. encodings]);
 
         Assert.Multiple(() =>
@@ -125,6 +43,29 @@ public class SettingsDialogEncodingListTests
                 comboBox.SelectedItem = EncodingRegistry.GetEncoding(saved, SettingsDialog.FallbackEncoding);
 
                 Assert.That(comboBox.SelectedIndex, Is.EqualTo(row), $"row {row} ('{saved}') is unreachable after a restart");
+            }
+        });
+    }
+
+    /// <summary>
+    /// The combo box has no <c>DisplayMember</c> — the dialog only sets <c>ValueMember</c>, and WinForms
+    /// falls back to it for the display text. Pinned because without that fallback every row would render
+    /// as <c>Encoding.ToString()</c>, i.e. a .NET type name, and the rows the user picks between would be
+    /// indistinguishable for a different reason than the one issue #688 reported.
+    /// </summary>
+    [Test]
+    [Apartment(ApartmentState.STA)]
+    public void EncodingComboBox_RendersEachRowAsItsHeaderName ()
+    {
+        using var comboBox = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, FormattingEnabled = true };
+        comboBox.ValueMember = "HeaderName";
+        comboBox.Items.AddRange([.. EncodingRegistry.OfferedEncodings]);
+
+        Assert.Multiple(() =>
+        {
+            foreach (Encoding encoding in comboBox.Items)
+            {
+                Assert.That(comboBox.GetItemText(encoding), Is.EqualTo(encoding.HeaderName));
             }
         });
     }

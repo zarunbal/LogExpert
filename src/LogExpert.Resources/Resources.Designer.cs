@@ -2285,56 +2285,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ASCII.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_encodingASCIIToolStripMenuItem {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_encodingASCIIToolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to GB2312.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_encodingGB2312toolStripMenuItem {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_encodingGB2312toolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to ISO-8859-1.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_encodingISO88591toolStripMenuItem {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_encodingISO88591toolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Encoding.
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_encodingToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_encodingToolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unicode.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_encodingUTF16toolStripMenuItem {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_encodingUTF16toolStripMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to UTF8.
-        /// </summary>
-        public static string LogTabWindow_UI_ToolStripMenuItem_encodingUTF8toolStripMenuItem {
-            get {
-                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_encodingUTF8toolStripMenuItem", resourceCulture);
             }
         }
         

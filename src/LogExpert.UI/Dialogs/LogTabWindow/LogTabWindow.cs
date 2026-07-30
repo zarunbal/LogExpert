@@ -13,7 +13,6 @@ using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
 using LogExpert.Core.Enums;
 using LogExpert.Core.EventArguments;
-using LogExpert.Core.Helpers;
 using LogExpert.Core.Interfaces;
 using LogExpert.Dialogs;
 using LogExpert.UI.Dialogs;
@@ -141,6 +140,10 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             Padding = new Padding(20, 0, 0, 0),
             BackColor = Color.FromKnownColor(KnownColor.Transparent)
         };
+
+        // Built here rather than declared in the designer so the menu and the Preferences combo box
+        // cannot offer different encodings.
+        EncodingMenuBuilder.Fill(encodingToolStripMenuItem, OnEncodingToolStripMenuItemClick);
 
         var index = buttonToolStrip.Items.IndexOfKey("toolStripButtonTail");
 
@@ -446,12 +449,9 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         jumpToPrevToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_jumpToPrevToolStripMenuItem;
         showBookmarkListToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_showBookmarkListToolStripMenuItem;
         columnFinderToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_columnFinderToolStripMenuItem;
+        // The rows below it are labelled with their encoding's header name, not from resources — an
+        // encoding name is the same in every language.
         encodingToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_encodingToolStripMenuItem;
-        encodingASCIIToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_encodingASCIIToolStripMenuItem;
-        encodingISO88591toolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_encodingISO88591toolStripMenuItem;
-        encodingUTF8toolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_encodingUTF8toolStripMenuItem;
-        encodingUTF16toolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_encodingUTF16toolStripMenuItem;
-        encodingGB2312toolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_encodingGB2312toolStripMenuItem;
         timeshiftToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_timeshiftToolStripMenuItem;
         timeshiftToolStripTextBox.Text = Resources.LogTabWindow_UI_ToolStripTextBox_timeshiftToolStripTextBox;
         copyMarkedLinesIntoNewTabToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_copyMarkedLinesIntoNewTabToolStripMenuItem;
@@ -2167,34 +2167,19 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         CurrentLogWindow?.JumpPrevBookmark();
     }
 
+    /// <summary>
+    /// One handler for every row of the Encoding menu: the clicked row carries the encoding it stands
+    /// for, so this does not know which encodings are offered.
+    /// </summary>
     [SupportedOSPlatform("windows")]
-    private void OnASCIIToolStripMenuItemClick (object sender, EventArgs e)
+    private void OnEncodingToolStripMenuItemClick (object sender, EventArgs e)
     {
-        CurrentLogWindow?.ChangeEncoding(Encoding.ASCII);
-    }
+        var encoding = EncodingMenuBuilder.EncodingOf(sender as ToolStripItem);
 
-    [SupportedOSPlatform("windows")]
-    private void OnUTF8ToolStripMenuItemClick (object sender, EventArgs e)
-    {
-        CurrentLogWindow?.ChangeEncoding(new UTF8Encoding(false));
-    }
-
-    [SupportedOSPlatform("windows")]
-    private void OnUTF16ToolStripMenuItemClick (object sender, EventArgs e)
-    {
-        CurrentLogWindow?.ChangeEncoding(Encoding.Unicode);
-    }
-
-    [SupportedOSPlatform("windows")]
-    private void OnISO88591ToolStripMenuItemClick (object sender, EventArgs e)
-    {
-        CurrentLogWindow?.ChangeEncoding(Encoding.Latin1);
-    }
-
-    [SupportedOSPlatform("windows")]
-    private void OnGB2312ToolStripMenuItemClick (object sender, EventArgs e)
-    {
-        CurrentLogWindow?.ChangeEncoding(EncodingRegistry.GetEncoding(EncodingRegistry.CODE_PAGE_GB2312));
+        if (encoding != null)
+        {
+            CurrentLogWindow?.ChangeEncoding(encoding);
+        }
     }
 
     [SupportedOSPlatform("windows")]

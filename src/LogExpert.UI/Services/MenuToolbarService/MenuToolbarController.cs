@@ -4,7 +4,6 @@ using System.Runtime.Versioning;
 using System.Text;
 
 using LogExpert.Core.EventArguments;
-using LogExpert.Core.Helpers;
 using LogExpert.Dialogs;
 using LogExpert.UI.Interface;
 
@@ -37,13 +36,9 @@ internal sealed class MenuToolbarController : IMenuToolbarController
     private ToolStripMenuItem _cellSelectMenuItem;
     private ToolStripMenuItem _columnFinderMenuItem;
 
-    // Encoding menu items
+    // The Encoding dropdown. Its rows are built by EncodingMenuBuilder and carry the encoding they
+    // stand for, so this controller never names an individual encoding.
     private ToolStripMenuItem _encodingMenuItem;
-    private ToolStripMenuItem _encodingAsciiMenuItem;
-    private ToolStripMenuItem _encodingUtf8MenuItem;
-    private ToolStripMenuItem _encodingUtf16MenuItem;
-    private ToolStripMenuItem _encodingIso88591MenuItem;
-    private ToolStripMenuItem _encodingGb2312MenuItem;
 
     // Toolbar items
     private ToolStripButton _bubblesButton;
@@ -97,11 +92,6 @@ internal sealed class MenuToolbarController : IMenuToolbarController
 
         // Encoding menu items
         _encodingMenuItem = FindMenuItem("encodingToolStripMenuItem");
-        _encodingAsciiMenuItem = FindMenuItem("encodingASCIIToolStripMenuItem");
-        _encodingUtf8MenuItem = FindMenuItem("encodingUTF8toolStripMenuItem");
-        _encodingUtf16MenuItem = FindMenuItem("encodingUTF16toolStripMenuItem");
-        _encodingIso88591MenuItem = FindMenuItem("encodingISO88591toolStripMenuItem");
-        _encodingGb2312MenuItem = FindMenuItem("encodingGB2312toolStripMenuItem");
 
         // Toolbar items
         _bubblesButton = FindToolStripItem<ToolStripButton>(_buttonToolbar, "toolStripButtonBubbles");
@@ -201,66 +191,26 @@ internal sealed class MenuToolbarController : IMenuToolbarController
             return;
         }
 
-        // Clear every row through the dropdown rather than row by row, so a row added to the menu
-        // cannot be left checked by a clear list nobody remembered to extend.
-        if (_encodingMenuItem != null)
+        if (_encodingMenuItem == null)
         {
-            foreach (var row in _encodingMenuItem.DropDownItems)
+            return;
+        }
+
+        // Matched by code page, not by instance: several Encoding instances stand for the same row —
+        // the menu applies UTF-8 without a BOM, the Preferences default is Encoding.UTF8 with one, and
+        // Encoding.Default (what a file with neither a preamble nor a configured default is read with)
+        // is a third UTF-8 instance. A file read with an encoding the menu does not offer leaves every
+        // row unchecked, which is honest: no offered row would reproduce it.
+        var currentCodePage = currentEncoding?.CodePage;
+
+        foreach (var row in _encodingMenuItem.DropDownItems)
+        {
+            if (row is ToolStripMenuItem encodingRow)
             {
-                SetCheckedSafe(row as ToolStripMenuItem, false);
+                encodingRow.Checked = currentCodePage != null
+                    && EncodingMenuBuilder.EncodingOf(encodingRow)?.CodePage == currentCodePage;
             }
         }
-
-        SetCheckedSafe(MenuItemFor(currentEncoding), true);
-    }
-
-    /// <summary>
-    /// The encoding menu row representing <paramref name="encoding"/>, or null when the file is read
-    /// with an encoding the menu does not offer (a Preferences default such as windows-1250, say).
-    /// </summary>
-    /// <remarks>
-    /// Matched by code page rather than by runtime type, because several instances stand for the same
-    /// row: the menu applies UTF-8 without a BOM while the Preferences default is
-    /// <see cref="Encoding.UTF8"/> with one, and <c>Encoding.Default</c> — what a file with neither a
-    /// preamble nor a configured default is read with — is a third UTF-8 instance. Type and equality
-    /// checks put those on different rows (or, before the "ANSI" row was dropped, on the row for a
-    /// different encoding entirely).
-    /// </remarks>
-    private ToolStripMenuItem MenuItemFor (Encoding encoding)
-    {
-        if (encoding == null)
-        {
-            return null;
-        }
-
-        var codePage = encoding.CodePage;
-
-        if (codePage == Encoding.ASCII.CodePage)
-        {
-            return _encodingAsciiMenuItem;
-        }
-
-        if (codePage == Encoding.UTF8.CodePage)
-        {
-            return _encodingUtf8MenuItem;
-        }
-
-        if (codePage == Encoding.Unicode.CodePage || codePage == Encoding.BigEndianUnicode.CodePage)
-        {
-            return _encodingUtf16MenuItem;
-        }
-
-        if (codePage == Encoding.Latin1.CodePage)
-        {
-            return _encodingIso88591MenuItem;
-        }
-
-        if (codePage == EncodingRegistry.CODE_PAGE_GB2312)
-        {
-            return _encodingGb2312MenuItem;
-        }
-
-        return null;
     }
 
     public void UpdateHighlightGroups (IEnumerable<string> groups, string selectedGroup)
@@ -437,7 +387,7 @@ internal sealed class MenuToolbarController : IMenuToolbarController
         LogIfNull(_searchMenuItem, "searchToolStripMenuItem");
         LogIfNull(_filterMenuItem, "filterToolStripMenuItem");
         LogIfNull(_timeshiftMenuItem, "timeshiftToolStripMenuItem");
-        LogIfNull(_encodingAsciiMenuItem, "encodingASCIIToolStripMenuItem");
+        LogIfNull(_encodingMenuItem, "encodingToolStripMenuItem");
         LogIfNull(_highlightGroupCombo, "highlightGroupsToolStripComboBox");
         LogIfNull(_lastUsedMenuItem, "lastUsedToolStripMenuItem");
     }

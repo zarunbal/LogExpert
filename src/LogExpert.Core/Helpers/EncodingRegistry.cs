@@ -30,13 +30,54 @@ public static class EncodingRegistry
     /// <summary>
     /// Code page of GB2312, the simplified-Chinese code page (issue #688).
     /// </summary>
-    /// <remarks>
-    /// Named — unlike the code pages that appear once, as a bare number, at the single place that
-    /// offers them — because three call sites have to agree on it: the Preferences default-encoding
-    /// list, the encoding menu row that applies it, and the check-state lookup that has to recognise a
-    /// file already being read with it.
-    /// </remarks>
     public const int CODE_PAGE_GB2312 = 936;
+
+    /// <summary>
+    /// The encodings LogExpert offers the user to choose from, in the order they are presented.
+    /// </summary>
+    /// <remarks>
+    /// The single list: the Preferences default-encoding combo box and the per-file View → Encoding
+    /// menu both draw their rows from it, so they cannot drift apart and adding an encoding is a
+    /// one-line change here. Three invariants, each pinned by a test:
+    /// <list type="bullet">
+    ///   <item>
+    ///     Every entry resolves from its own <see cref="Encoding.HeaderName"/>, because that name is
+    ///     what gets persisted (in the settings JSON and in a .lxp) and resolved again on the next
+    ///     start. An entry that did not would silently degrade to a fallback.
+    ///   </item>
+    ///   <item>
+    ///     No two entries share a code page. Both UIs label a row with its header name, so two entries
+    ///     for one code page are two rows the user cannot tell apart — which is exactly what
+    ///     <c>Encoding.Default</c> alongside <see cref="Encoding.UTF8"/> produced (both are code page
+    ///     65001 on .NET, differing only in the BOM they emit, which a read-side encoding never uses).
+    ///     Hence no <c>Encoding.Default</c> entry.
+    ///   </item>
+    ///   <item>
+    ///     New entries are appended rather than sorted in, so an existing user's row does not move
+    ///     under the cursor on upgrade.
+    ///   </item>
+    /// </list>
+    /// </remarks>
+    public static IReadOnlyList<Encoding> OfferedEncodings => _offeredEncodings.Value;
+
+    /// <remarks>
+    /// Built once: <see cref="Encoding"/> instances are immutable and the ones from
+    /// <see cref="GetEncoding(int)"/> are cached by .NET anyway, so the list is safe to share. Lazy
+    /// rather than a plain initialiser so the code pages resolve through
+    /// <see cref="EnsureRegistered"/> rather than depending on when this class is first touched.
+    /// </remarks>
+    private static readonly Lazy<IReadOnlyList<Encoding>> _offeredEncodings = new(
+        () =>
+        [
+            Encoding.ASCII,
+            Encoding.Latin1,
+            Encoding.UTF8,
+            Encoding.Unicode,
+            GetEncoding(1250),
+            GetEncoding(1252),
+            GetEncoding(CODE_PAGE_GB2312)
+        ],
+        LazyThreadSafetyMode.ExecutionAndPublication);
 
     /// <summary>
     /// Registers <see cref="CodePagesEncodingProvider"/> on first use.

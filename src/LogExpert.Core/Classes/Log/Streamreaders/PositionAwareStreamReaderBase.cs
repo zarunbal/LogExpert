@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 
 using LogExpert.Core.Entities;
 
@@ -221,8 +221,19 @@ public abstract class PositionAwareStreamReaderBase : LogStreamReaderBase
         return (0, null);
     }
 
+    /// <summary>
+    /// Bytes to advance the position by per character read, or 0 for "measure the character".
+    /// </summary>
+    /// <remarks>
+    /// The fallback is keyed on <see cref="Encoding.IsSingleByte"/>, not on "everything else is one
+    /// byte": a variable-width code page such as GB2312 (one byte per ASCII character, two per Chinese
+    /// one) is neither a <see cref="UTF8Encoding"/> nor a <see cref="UnicodeEncoding"/>, and counting it
+    /// as one byte per character drifts the position on the first non-ASCII character.
+    /// </remarks>
     public static int GetPosIncPrecomputed (Encoding usedEncoding)
     {
+        ArgumentNullException.ThrowIfNull(usedEncoding);
+
         switch (usedEncoding)
         {
             case UTF8Encoding:
@@ -235,7 +246,7 @@ public abstract class PositionAwareStreamReaderBase : LogStreamReaderBase
                 }
             default:
                 {
-                    return 1;
+                    return usedEncoding.IsSingleByte ? 1 : 0;
                 }
         }
     }
