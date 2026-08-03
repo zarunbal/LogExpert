@@ -1,7 +1,13 @@
 using System.Runtime.Versioning;
 
+using LogExpert.Core.Config;
+using LogExpert.Core.Entities;
+using LogExpert.Core.Interfaces;
 using LogExpert.UI.Controls.LogWindow;
+using LogExpert.UI.Interface;
 using LogExpert.UI.Services.TabControllerService;
+
+using Moq;
 
 using NUnit.Framework;
 
@@ -11,11 +17,8 @@ namespace LogExpert.Tests.Services;
 
 /// <summary>
 /// Unit tests for TabController.
-/// Note: Many tests are limited because LogWindow is a complex WinForms control that cannot be easily mocked or
-/// subclassed. Tests that require actual LogWindow instances would need to be run as integration tests with full UI
-/// infrastructure.
-/// These tests focus on the core TabController functionality that can be tested without instantiating LogWindow
-/// objects.
+/// Most tests focus on behavior that does not require LogWindow instances.
+/// Tests that verify DockPanel tab order create real LogWindow instances through CreateLogWindow.
 /// </summary>
 [TestFixture]
 [SupportedOSPlatform("windows")]
@@ -36,7 +39,10 @@ internal class TabControllerTests : IDisposable
         _dockPanel = new DockPanel
         {
             Dock = DockStyle.Fill,
-            DocumentStyle = DocumentStyle.DockingMdi
+            // Match LogExpert's document style; DockingMdi required test form to be an MDI container.
+			// Using DockingWindow both matches production behavior and allows the test to create real tabs without setting up an artificial MDI container.
+            DocumentStyle = DocumentStyle.DockingWindow,
+            Theme = new VS2015LightTheme()
         };
         _testForm.Controls.Add(_dockPanel);
         _testForm.Show(); // Must show form for DockPanel to work
@@ -191,9 +197,53 @@ internal class TabControllerTests : IDisposable
         Assert.That(result, Is.InstanceOf<IReadOnlyList<LogWindow>>());
     }
 
+    [Test]
+    public void GetAllWindowsFromDockPanel_ReturnsDisplayedWindowsInTabOrder ()
+    {
+        // Arrange
+        using var firstWindow = CreateLogWindow("first.log");
+        using var secondWindow = CreateLogWindow("second.log");
+        using var thirdWindow = CreateLogWindow("third.log");
+
+        _tabController.AddWindow(firstWindow, "first.log");
+        _tabController.AddWindow(secondWindow, "second.log");
+        _tabController.AddWindow(thirdWindow, "third.log");
+
+        // Act
+        var result = _tabController.GetAllWindowsFromDockPanel();
+
+        // Assert
+        Assert.That(result, Is.EqualTo(new[] { firstWindow, secondWindow, thirdWindow }));
+    }
+
     #endregion
 
-    #region GetAllWindows Tests
+    #region Helpers
+
+    private static LogWindow CreateLogWindow (string fileName)
+    {
+        var coordinatorMock = new Mock<ILogWindowCoordinator>();
+        _ = coordinatorMock.Setup(coordinator => coordinator.ResolveHighlightGroup(It.IsAny<string?>(), It.IsAny<string?>())).Returns(new HighlightGroup());
+        _ = coordinatorMock.SetupGet(coordinator => coordinator.SearchParams).Returns(new SearchParams());
+
+        var configManagerMock = new Mock<IConfigManager>();
+        _ = configManagerMock.SetupGet(configManager => configManager.Settings).Returns(new Settings());
+
+        var pluginRegistryMock = new Mock<IPluginRegistry>();
+        _ = pluginRegistryMock.SetupGet(pluginRegistry => pluginRegistry.RegisteredColumnizers).Returns([new DefaultLogfileColumnizer()]);
+
+        return new LogWindow(
+            coordinatorMock.Object,
+            fileName,
+            isTempFile: false,
+            forcePersistenceLoading: false,
+            configManagerMock.Object,
+            pluginRegistryMock.Object);
+    }
+
+    #endregion
+    
+	#region GetAllWindows Tests
 
     [Test]
     public void GetAllWindows_WhenEmpty_ReturnsEmptyList ()
@@ -315,10 +365,8 @@ internal class TabControllerTests : IDisposable
         // Arrange
         using var controller = new TabController();
 
-        // Create a mock-like object that's not null to avoid ArgumentNullException
-        // We need to test that the "not initialized" check happens
-        // Unfortunately, LogWindow cannot be instantiated without its dependencies
-        // So we can only verify the ArgumentNullException is thrown first for null
+       // CreateLogWindow can now provide a non-null LogWindow when needed.
+       // This test verifies that null argument validation happens before the initialization check.
         var ex = Assert.Throws<ArgumentNullException>(() => controller.AddWindow(null, "Test"));
         Assert.That(ex.ParamName, Is.EqualTo("window"));
     }
