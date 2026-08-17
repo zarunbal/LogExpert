@@ -150,7 +150,7 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
 
         ILogFileInfo fileInfo = null;
 
-        IsMultiFile = multiFile || fileNames.Length == 1;
+        IsMultiFile = multiFile;
         _fileName = fileNames[0];
 
         IEnumerable<string> names = IsMultiFile
