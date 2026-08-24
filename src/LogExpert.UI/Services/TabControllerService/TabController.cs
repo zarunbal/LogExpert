@@ -461,12 +461,29 @@ internal class TabController : ITabController
     /// <returns>Read-only list of all LogWindows in the DockPanel</returns>
     public IReadOnlyList<LogWindow> GetAllWindowsFromDockPanel ()
     {
-        return !_initialized || _dockPanel == null
-            ? []
-            : _dockPanel.Panes
-                .SelectMany(pane => pane.DisplayingContents.OfType<LogWindow>())
-                .ToList()
-                .AsReadOnly();
+        if (!_initialized || _dockPanel == null)
+        {
+            return [];
+        }
+
+        var windows = new List<LogWindow>();
+
+        foreach (DockPane pane in _dockPanel.Panes)
+        {
+            var displayingContents = pane.DisplayingContents;
+
+            // Use 'for' instead of 'foreach': DisplayingContents exposes displayed tabs through Count and its indexer.
+            // 'foreach' uses the inherited ReadOnlyCollection enumerator and does not return displayed tabs.
+            for (int index = 0; index < displayingContents.Count; index++)
+            {
+                if (displayingContents[index] is LogWindow logWindow)
+                {
+                    windows.Add(logWindow);
+                }
+            }
+        }
+
+        return windows.AsReadOnly();
     }
 
     #endregion

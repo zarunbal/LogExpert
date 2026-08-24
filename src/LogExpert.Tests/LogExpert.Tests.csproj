@@ -29,6 +29,8 @@
     <PackageReference Include="NUnit" />
     <PackageReference Include="NUnit3TestAdapter" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <!-- Required by TabControllerTests to create themed DockPanel document tabs. -->
+    <PackageReference Include="DockPanelSuite.ThemeVS2015" />
   </ItemGroup>
 
   <ItemGroup Label="Data">
