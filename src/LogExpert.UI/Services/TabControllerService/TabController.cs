@@ -472,8 +472,8 @@ internal class TabController : ITabController
         {
             var displayingContents = pane.DisplayingContents;
 
-        // Use 'for' instead of 'foreach': DisplayingContents exposes displayed tabs through Count and its indexer.
-        // 'foreach' uses the inherited ReadOnlyCollection enumerator and does not return displayed tabs.
+            // Use 'for' instead of 'foreach': DisplayingContents exposes displayed tabs through Count and its indexer.
+            // 'foreach' uses the inherited ReadOnlyCollection enumerator and does not return displayed tabs.
             for (int index = 0; index < displayingContents.Count; index++)
             {
                 if (displayingContents[index] is LogWindow logWindow)
