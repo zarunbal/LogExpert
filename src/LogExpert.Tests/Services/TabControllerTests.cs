@@ -40,7 +40,8 @@ internal class TabControllerTests : IDisposable
         {
             Dock = DockStyle.Fill,
             // Match LogExpert's document style; DockingMdi required test form to be an MDI container.
-			// Using DockingWindow both matches production behavior and allows the test to create real tabs without setting up an artificial MDI container.
+            // Use DockingWindow to match production and avoid requiring
+            // an artificial MDI container in this test.
             DocumentStyle = DocumentStyle.DockingWindow,
             Theme = new VS2015LightTheme()
         };
@@ -218,32 +219,7 @@ internal class TabControllerTests : IDisposable
 
     #endregion
 
-    #region Helpers
-
-    private static LogWindow CreateLogWindow (string fileName)
-    {
-        var coordinatorMock = new Mock<ILogWindowCoordinator>();
-        _ = coordinatorMock.Setup(coordinator => coordinator.ResolveHighlightGroup(It.IsAny<string?>(), It.IsAny<string?>())).Returns(new HighlightGroup());
-        _ = coordinatorMock.SetupGet(coordinator => coordinator.SearchParams).Returns(new SearchParams());
-
-        var configManagerMock = new Mock<IConfigManager>();
-        _ = configManagerMock.SetupGet(configManager => configManager.Settings).Returns(new Settings());
-
-        var pluginRegistryMock = new Mock<IPluginRegistry>();
-        _ = pluginRegistryMock.SetupGet(pluginRegistry => pluginRegistry.RegisteredColumnizers).Returns([new DefaultLogfileColumnizer()]);
-
-        return new LogWindow(
-            coordinatorMock.Object,
-            fileName,
-            isTempFile: false,
-            forcePersistenceLoading: false,
-            configManagerMock.Object,
-            pluginRegistryMock.Object);
-    }
-
-    #endregion
-    
-	#region GetAllWindows Tests
+    #region GetAllWindows Tests
 
     [Test]
     public void GetAllWindows_WhenEmpty_ReturnsEmptyList ()
@@ -365,8 +341,7 @@ internal class TabControllerTests : IDisposable
         // Arrange
         using var controller = new TabController();
 
-       // CreateLogWindow can now provide a non-null LogWindow when needed.
-       // This test verifies that null argument validation happens before the initialization check.
+        // Validate the argument before checking whether the controller is initialized.
         var ex = Assert.Throws<ArgumentNullException>(() => controller.AddWindow(null, "Test"));
         Assert.That(ex.ParamName, Is.EqualTo("window"));
     }
@@ -460,6 +435,31 @@ internal class TabControllerTests : IDisposable
 
         // Act & Assert - should not throw
         Assert.DoesNotThrow(_tabController.SwitchToPreviousWindow);
+    }
+
+    #endregion
+
+    #region Helpers
+
+    private static LogWindow CreateLogWindow (string fileName)
+    {
+        var coordinatorMock = new Mock<ILogWindowCoordinator>();
+        _ = coordinatorMock.Setup(coordinator => coordinator.ResolveHighlightGroup(It.IsAny<string?>(), It.IsAny<string?>())).Returns(new HighlightGroup());
+        _ = coordinatorMock.SetupGet(coordinator => coordinator.SearchParams).Returns(new SearchParams());
+
+        var configManagerMock = new Mock<IConfigManager>();
+        _ = configManagerMock.SetupGet(configManager => configManager.Settings).Returns(new Settings());
+
+        var pluginRegistryMock = new Mock<IPluginRegistry>();
+        _ = pluginRegistryMock.SetupGet(pluginRegistry => pluginRegistry.RegisteredColumnizers).Returns([new DefaultLogfileColumnizer()]);
+
+        return new LogWindow(
+            coordinatorMock.Object,
+            fileName,
+            isTempFile: false,
+            forcePersistenceLoading: false,
+            configManagerMock.Object,
+            pluginRegistryMock.Object);
     }
 
     #endregion
