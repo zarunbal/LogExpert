@@ -5,9 +5,11 @@ using LogExpert.Core.Entities;
 using LogExpert.Core.Enums;
 using LogExpert.Core.Interfaces;
 
+using Moq;
+
 using NUnit.Framework;
 
-namespace LogExpert.Tests.Buffers;
+namespace LogExpert.Tests.StreamReaderTests;
 
 [TestFixture]
 internal sealed class LogfileReaderSingleFileMonitoringTests
@@ -38,7 +40,16 @@ internal sealed class LogfileReaderSingleFileMonitoringTests
     [Test]
     public void SingleFileReader_OnTruncation_ReportsNewFileNotRollover ()
     {
-        using var reporter = new RecordingProgressReporter();
+        using var loadingFinished = new ManualResetEventSlim(false);
+        using var newFileReported = new ManualResetEventSlim(false);
+        var progressReporterMock = new Mock<ILoadProgressReporter>();
+        progressReporterMock
+            .Setup(reporter => reporter.ReportLoadingFinished())
+            .Callback(() => loadingFinished.Set());
+        progressReporterMock
+            .Setup(reporter => reporter.ReportNewFile(It.IsAny<string>(), It.IsAny<long>(), It.IsAny<long>()))
+            .Callback(() => newFileReported.Set());
+
         using var reader = new LogfileReader(
             _logFile,
             new EncodingOptions { Encoding = Encoding.UTF8 },
@@ -49,51 +60,17 @@ internal sealed class LogfileReaderSingleFileMonitoringTests
             ReaderType.System,
             PluginRegistry.PluginRegistry.Instance,
             maximumLineLength: 500,
-            progressReporter: reporter);
+            progressReporter: progressReporterMock.Object);
 
         var rolloverReported = false;
         reader.FileSizeChanged += (_, args) => rolloverReported |= args.IsRollover;
 
         reader.StartMonitoring();
-        Assert.That(reporter.LoadingFinished.Wait(TimeSpan.FromSeconds(5)), Is.True, "Initial load did not finish");
+        Assert.That(loadingFinished.Wait(TimeSpan.FromSeconds(5)), Is.True, "Initial load did not finish");
 
         File.WriteAllText(_logFile, "replacement\n", Encoding.UTF8);
 
-        Assert.That(reporter.NewFileReported.Wait(TimeSpan.FromSeconds(5)), Is.True, "Truncation did not report a new file");
+        Assert.That(newFileReported.Wait(TimeSpan.FromSeconds(5)), Is.True, "Truncation did not report a new file");
         Assert.That(rolloverReported, Is.False);
-    }
-
-    private sealed class RecordingProgressReporter : ILoadProgressReporter
-    {
-        public ManualResetEventSlim LoadingFinished { get; } = new(false);
-        public ManualResetEventSlim NewFileReported { get; } = new(false);
-
-        public void ReportProgress (string fileName, long position, long fileLength)
-        {
-        }
-
-        public void ReportComplete (string fileName, long position, long fileLength)
-        {
-        }
-
-        public void ReportNewFile (string fileName, long position, long fileLength)
-        {
-            NewFileReported.Set();
-        }
-
-        public void ReportLoadingStarted (string fileName)
-        {
-        }
-
-        public void ReportLoadingFinished ()
-        {
-            LoadingFinished.Set();
-        }
-
-        public void Dispose ()
-        {
-            LoadingFinished.Dispose();
-            NewFileReported.Dispose();
-        }
     }
 }

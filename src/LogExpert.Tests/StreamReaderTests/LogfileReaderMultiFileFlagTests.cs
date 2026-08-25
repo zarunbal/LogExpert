@@ -12,6 +12,8 @@ namespace LogExpert.Tests.StreamReaderTests;
 [TestFixture]
 internal sealed class LogfileReaderMultiFileFlagTests
 {
+    private static readonly string _testDataDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestData");
+
     private string _testDirectory = null!;
     private string _logFile = null!;
 
@@ -22,8 +24,8 @@ internal sealed class LogfileReaderMultiFileFlagTests
         _ = Directory.CreateDirectory(_testDirectory);
         _logFile = Path.Combine(_testDirectory, "app.log");
 
-        WriteLines(_logFile, 10);
-        WriteLines(_logFile + ".1", 10);
+        File.Copy(Path.Combine(_testDataDirectory, "app.log"), _logFile);
+        File.Copy(Path.Combine(_testDataDirectory, "app.log.1"), _logFile + ".1");
 
         _ = PluginRegistry.PluginRegistry.Create(_testDirectory, 500);
     }
@@ -48,7 +50,7 @@ internal sealed class LogfileReaderMultiFileFlagTests
         {
             Assert.That(reader.IsMultiFile, Is.False);
             Assert.That(reader.GetLogFileInfoList(), Has.Count.EqualTo(1));
-            Assert.That(reader.LineCount, Is.EqualTo(10));
+            Assert.That(reader.LineCount, Is.EqualTo(1));
         });
     }
 
@@ -104,8 +106,4 @@ internal sealed class LogfileReaderMultiFileFlagTests
             progressReporter: NullProgressReporter.Instance);
     }
 
-    private static void WriteLines (string fileName, int lineCount)
-    {
-        File.WriteAllLines(fileName, Enumerable.Range(1, lineCount).Select(index => $"Line {index}"), Encoding.UTF8);
-    }
 }
