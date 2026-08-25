@@ -35,6 +35,21 @@ public static class SessionPersister
 
             // Set Session file path for alternative file search
             sessionData.SessionFilePath = sessionFileName;
+            sessionData.FileNames ??= [];
+
+            // v1.42.0 wrote Sessions with an empty FileNames list (issue #694): the save path
+            // enumerated DockPanelSuite's DisplayingContents with foreach, which yields nothing.
+            // The tab layout XML in those files still names every log window, so recover from there.
+            if (sessionData.FileNames.Count == 0)
+            {
+                var recovered = SessionFileResolver.RecoverFileNamesFromLayout(sessionData.TabLayoutXml);
+
+                if (recovered.Count > 0)
+                {
+                    _logger.Warn($"Session {sessionFileName} has an empty file list; recovered {recovered.Count} file(s) from the tab layout");
+                    sessionData.FileNames = [.. recovered];
+                }
+            }
 
             // Resolve Session File (.lxp) entries to actual .log files
             var resolvedFiles = SessionFileResolver.ResolveSessionFiles(sessionData, pluginRegistry);
