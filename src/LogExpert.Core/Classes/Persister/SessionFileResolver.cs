@@ -1,5 +1,8 @@
 using System.Collections.ObjectModel;
+using System.Xml;
+using System.Xml.Linq;
 
+using LogExpert.Core.Enums;
 using LogExpert.Core.Interfaces;
 
 namespace LogExpert.Core.Classes.Persister;
@@ -30,5 +33,40 @@ public static class SessionFileResolver
         }
 
         return resolved.AsReadOnly();
+    }
+
+    /// <summary>
+    /// Recovers the log file paths from a Session's tab layout XML. The DockPanel layout names
+    /// every log window in a <c>PersistString="LogWindow#&lt;path&gt;"</c> attribute, so a Session
+    /// whose FileNames list is missing or empty can still be restored from its layout.
+    /// </summary>
+    /// <param name="tabLayoutXml">The DockPanel layout XML stored in the Session, may be null or malformed</param>
+    /// <returns>The log file paths in layout order; empty if the XML is null, malformed, or names no log windows</returns>
+    public static ReadOnlyCollection<string> RecoverFileNamesFromLayout (string tabLayoutXml)
+    {
+        if (string.IsNullOrWhiteSpace(tabLayoutXml))
+        {
+            return ReadOnlyCollection<string>.Empty;
+        }
+
+        var prefix = WindowTypes.LogWindow + "#";
+
+        try
+        {
+            var fileNames = XDocument.Parse(tabLayoutXml)
+                .Descendants("Content")
+                .Select(content => (string)content.Attribute("PersistString"))
+                .Where(persistString => persistString != null &&
+                                        persistString.StartsWith(prefix, StringComparison.OrdinalIgnoreCase) &&
+                                        persistString.Length > prefix.Length)
+                .Select(persistString => persistString[prefix.Length..])
+                .ToList();
+
+            return fileNames.AsReadOnly();
+        }
+        catch (XmlException)
+        {
+            return ReadOnlyCollection<string>.Empty;
+        }
     }
 }
