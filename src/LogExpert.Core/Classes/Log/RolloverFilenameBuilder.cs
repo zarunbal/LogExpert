@@ -238,6 +238,7 @@ public class RolloverFilenameBuilder
             }
         }
 
+        _ = result.Append(Regex.Escape(segment.ToString()));
         fmt = result.ToString().Replace('\xFFFD', '*');
         return fmt;
     }

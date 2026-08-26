@@ -32,6 +32,7 @@ internal class RollingNameTest
     [TestCase("engine.log", "engine1.log","engine$J.log")]
     [TestCase("engine1.log", "engine2.log","engine$J.log")]
     [TestCase("engine.log", "engine.log.1","*$J(.)")]
+    [TestCase("engine.log", "engine.1.log", "*$J(.).log")]
     [TestCase("engine_2010-06-12.log", "engine_2010-06-12.log.1", "*$D(yyyy-MM-dd).log$J(.)")]
     public void TestFilenameAnd1(string fileName, string expectedResult, string formatString)
     {
@@ -45,6 +46,7 @@ internal class RollingNameTest
     [Test]
     [TestCase("engine.log", "engine.log.2","*$J(.)")]
     [TestCase("engine.log", "engine.log.2","*.log$J(.)")]
+    [TestCase("engine.log", "engine.2.log", "*$J(.).log")]
     public void TestFilenameAnd2(string fileName, string expectedResult, string formatString)
     {
         RolloverFilenameBuilder fnb = new(formatString);
