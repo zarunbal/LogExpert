@@ -327,12 +327,9 @@ internal partial class SettingsDialog : Form
 
     private void FillColorModeList ()
     {
-        foreach (var colorMode in Enum.GetValues<ColorMode>())
+        foreach (var colorMode in Enum.GetValues<ColorMode>().Where(cm => !comboBoxColorMode.Items.Contains(cm)))
         {
-            if (!comboBoxColorMode.Items.Contains(colorMode))
-            {
-                _ = comboBoxColorMode.Items.Add(colorMode);
-            }
+            _ = comboBoxColorMode.Items.Add(colorMode);
         }
 
         comboBoxColorMode.SelectedItem = Preferences.ColorMode;
