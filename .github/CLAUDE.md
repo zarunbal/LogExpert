@@ -265,7 +265,7 @@ LogExpert/
 
 - UI components in `LogExpert.UI` project
 - Follow existing High DPI patterns (no AutoScale on controls)
-- Test with both light and dark mode (see `SetDarkMode()` in Program.cs)
+- Test with both light and dark mode (see `SetColorMode()` in Program.cs; the `ColorMode` preference is Light/Dark/System)
 - Use localization resources from `LogExpert.Resources` project
 - Windows Forms designer files: `*.designer.cs`
 

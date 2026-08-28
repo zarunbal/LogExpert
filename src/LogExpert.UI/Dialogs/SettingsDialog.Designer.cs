@@ -41,7 +41,8 @@ partial class SettingsDialog
         groupBoxDefaults = new GroupBox();
         labelLanguage = new Label();
         comboBoxLanguage = new ComboBox();
-        checkBoxDarkMode = new CheckBox();
+        labelColorMode = new Label();
+        comboBoxColorMode = new ComboBox();
         checkBoxFollowTail = new CheckBox();
         checkBoxColumnFinder = new CheckBox();
         checkBoxSyncFilter = new CheckBox();
@@ -495,7 +496,8 @@ partial class SettingsDialog
         // 
         groupBoxDefaults.Controls.Add(labelLanguage);
         groupBoxDefaults.Controls.Add(comboBoxLanguage);
-        groupBoxDefaults.Controls.Add(checkBoxDarkMode);
+        groupBoxDefaults.Controls.Add(labelColorMode);
+        groupBoxDefaults.Controls.Add(comboBoxColorMode);
         groupBoxDefaults.Controls.Add(checkBoxFollowTail);
         groupBoxDefaults.Controls.Add(checkBoxColumnFinder);
         groupBoxDefaults.Controls.Add(checkBoxSyncFilter);
@@ -529,17 +531,26 @@ partial class SettingsDialog
         comboBoxLanguage.Size = new Size(177, 23);
         comboBoxLanguage.TabIndex = 9;
         toolTip.SetToolTip(comboBoxLanguage, "Userinterface language");
-        // 
-        // checkBoxDarkMode
-        // 
-        checkBoxDarkMode.AutoSize = true;
-        checkBoxDarkMode.Location = new Point(9, 144);
-        checkBoxDarkMode.Margin = new Padding(4);
-        checkBoxDarkMode.Name = "checkBoxDarkMode";
-        checkBoxDarkMode.Size = new Size(175, 19);
-        checkBoxDarkMode.TabIndex = 6;
-        checkBoxDarkMode.Text = "Dark Mode (restart required)";
-        checkBoxDarkMode.UseVisualStyleBackColor = true;
+        //
+        // labelColorMode
+        //
+        labelColorMode.AutoSize = true;
+        labelColorMode.Location = new Point(9, 147);
+        labelColorMode.Margin = new Padding(4, 0, 4, 0);
+        labelColorMode.Name = "labelColorMode";
+        labelColorMode.Size = new Size(160, 15);
+        labelColorMode.TabIndex = 18;
+        labelColorMode.Text = "Color mode (restart required)";
+        //
+        // comboBoxColorMode
+        //
+        comboBoxColorMode.DropDownStyle = ComboBoxStyle.DropDownList;
+        comboBoxColorMode.FormattingEnabled = true;
+        comboBoxColorMode.Location = new Point(204, 144);
+        comboBoxColorMode.Margin = new Padding(4, 5, 4, 5);
+        comboBoxColorMode.Name = "comboBoxColorMode";
+        comboBoxColorMode.Size = new Size(177, 23);
+        comboBoxColorMode.TabIndex = 6;
         // 
         // checkBoxFollowTail
         // 
@@ -2280,7 +2291,8 @@ partial class SettingsDialog
     private System.Windows.Forms.CheckBox checkBoxPortableMode;
     private System.Windows.Forms.RadioButton radioButtonSessionApplicationStartupDir;
     private System.Windows.Forms.CheckBox checkBoxShowErrorMessageOnlyOneInstance;
-    private System.Windows.Forms.CheckBox checkBoxDarkMode;
+    private System.Windows.Forms.Label labelColorMode;
+    private System.Windows.Forms.ComboBox comboBoxColorMode;
     private System.Windows.Forms.NumericUpDown upDownMaximumLineLength;
     private System.Windows.Forms.Label labelMaximumLineLength;
     private System.Windows.Forms.Label labelWarningMaximumLineLength;
