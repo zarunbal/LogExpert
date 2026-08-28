@@ -185,7 +185,7 @@ internal partial class SettingsDialog : Form
 
         FillPortableMode();
 
-        checkBoxDarkMode.Checked = Preferences.DarkMode;
+        FillColorModeList();
         checkBoxTimestamp.Checked = Preferences.TimestampControl;
         checkBoxSyncFilter.Checked = Preferences.FilterSync;
         checkBoxFilterTail.Checked = Preferences.FilterTail;
@@ -323,6 +323,16 @@ internal partial class SettingsDialog : Form
         }
 
         comboBoxReaderType.SelectedItem = Preferences.ReaderType;
+    }
+
+    private void FillColorModeList ()
+    {
+        foreach (var colorMode in Enum.GetValues<ColorMode>().Where(cm => !comboBoxColorMode.Items.Contains(cm)))
+        {
+            _ = comboBoxColorMode.Items.Add(colorMode);
+        }
+
+        comboBoxColorMode.SelectedItem = Preferences.ColorMode;
     }
 
     internal void FillPortableMode ()
@@ -818,7 +828,7 @@ internal partial class SettingsDialog : Form
         Preferences.MaximumFilterEntries = (int)upDownMaximumFilterEntries.Value;
         Preferences.MaximumFilterEntriesDisplayed = (int)upDownMaximumFilterEntriesDisplayed.Value;
         Preferences.ShowErrorMessageAllowOnlyOneInstances = checkBoxShowErrorMessageOnlyOneInstance.Checked;
-        Preferences.DarkMode = checkBoxDarkMode.Checked;
+        Preferences.ColorMode = comboBoxColorMode.SelectedItem is ColorMode colorMode ? colorMode : ColorMode.Light;
         Preferences.MaxLineLength = (int)upDownMaximumLineLength.Value;
         Preferences.MaxDisplayLength = Math.Min((int)upDownMaxDisplayLength.Value, (int)upDownMaximumLineLength.Value);
 

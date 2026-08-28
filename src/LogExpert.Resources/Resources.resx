@@ -863,8 +863,8 @@ Checked tools will appear in the icon bar. All other tools are available in the 
   <data name="SettingsDialog_UI_CheckBox_checkBoxAskCloseTabs" xml:space="preserve">
         <value>Ask before closing tabs</value>
     </data>
-  <data name="SettingsDialog_UI_CheckBox_checkBoxDarkMode" xml:space="preserve">
-        <value>Dark Mode (restart required)</value>
+  <data name="SettingsDialog_UI_Label_labelColorMode" xml:space="preserve">
+        <value>Color mode (restart required)</value>
     </data>
   <data name="SettingsDialog_UI_CheckBox_checkBoxFollowTail" xml:space="preserve">
         <value>Follow tail enabled</value>

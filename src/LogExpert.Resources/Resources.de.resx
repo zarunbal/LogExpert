@@ -976,8 +976,8 @@ Damit die anderen Fenster beim Auswählen einer Zeile (Mausklick oder Pfeiltaste
   <data name="SettingsDialog_UI_CheckBox_checkBoxFollowTail" xml:space="preserve">
 		<value>Dem Ende folgen aktivieren</value>
 	</data>
-  <data name="SettingsDialog_UI_CheckBox_checkBoxDarkMode" xml:space="preserve">
-		<value>Dark Mode (neustart benötigt)</value>
+  <data name="SettingsDialog_UI_Label_labelColorMode" xml:space="preserve">
+		<value>Farbmodus (Neustart benötigt)</value>
 	</data>
   <data name="SettingsDialog_UI_CheckBox_checkBoxAskCloseTabs" xml:space="preserve">
 		<value>Fragen vor dem schließen des Tabs</value>

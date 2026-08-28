@@ -5194,11 +5194,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Dark Mode (restart required).
+        ///   Looks up a localized string similar to Color mode (restart required).
         /// </summary>
-        public static string SettingsDialog_UI_CheckBox_checkBoxDarkMode {
+        public static string SettingsDialog_UI_Label_labelColorMode {
             get {
-                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_checkBoxDarkMode", resourceCulture);
+                return ResourceManager.GetString("SettingsDialog_UI_Label_labelColorMode", resourceCulture);
             }
         }
         
