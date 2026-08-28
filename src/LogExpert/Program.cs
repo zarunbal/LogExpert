@@ -257,7 +257,7 @@ internal static class Program
         }
         else
         {
-            Application.SetColorMode(SystemColorMode.System);
+            Application.SetColorMode(SystemColorMode.Classic);
         }
     }
 
