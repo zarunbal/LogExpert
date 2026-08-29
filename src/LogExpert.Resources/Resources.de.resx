@@ -1683,7 +1683,7 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
 $D(&lt;date&gt;) = Datumsmuster
 $I = Dateiindexnummer
 $J = Dateiindexnummer, versteckt wenn 09
-$J(&lt;prefix&gt;) = Wie $J, jedoch wird ein &lt;prefix&gt; hinzugefügt when es nicht 0 ist
+$J(&lt;prefix&gt;) = Wie $J, jedoch wird ein &lt;prefix&gt; hinzugefügt wenn es nicht 0 ist
 
 Beispiele:
 *$J(.) → app.log, app.log.1, app.log.2
