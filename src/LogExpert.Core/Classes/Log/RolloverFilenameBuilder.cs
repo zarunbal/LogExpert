@@ -116,15 +116,23 @@ public class RolloverFilenameBuilder
 
         if (_indexGroup != null && _indexGroup.Success)
         {
-            fileName = fileName.Remove(_indexGroup.Index, _indexGroup.Length);
+            var indexPosition = _indexGroup.Index;
+            var indexLength = _indexGroup.Length;
+            if (_condGroup != null && _condGroup.Success)
+            {
+                indexPosition = _condGroup.Index;
+                indexLength += _condGroup.Length;
+            }
+
+            fileName = fileName.Remove(indexPosition, indexLength);
 
             if (!_hideZeroIndex || Index > 0)
             {
                 var format = "D" + _indexGroup.Length;
-                fileName = fileName.Insert(_indexGroup.Index, Index.ToString(format));
+                fileName = fileName.Insert(indexPosition, Index.ToString(format));
                 if (_hideZeroIndex && _condContent != null)
                 {
-                    fileName = fileName.Insert(_indexGroup.Index, _condContent);
+                    fileName = fileName.Insert(indexPosition, _condContent);
                 }
             }
         }
@@ -141,14 +149,14 @@ public class RolloverFilenameBuilder
     private void ParseFormatString (string formatString)
     {
         var fmt = EscapeNonvarRegions(formatString);
-        var datePos = formatString.IndexOf("$D(", StringComparison.Ordinal);
+        var datePos = fmt.IndexOf("$D(", StringComparison.Ordinal);
 
         if (datePos != -1)
         {
-            var endPos = formatString.IndexOf(')', datePos);
+            var endPos = fmt.IndexOf(')', datePos);
             if (endPos != -1)
             {
-                _dateTimeFormat = formatString.Substring(datePos + 3, endPos - datePos - 3)
+                _dateTimeFormat = fmt.Substring(datePos + 3, endPos - datePos - 3)
                                               .ToUpperInvariant()
                                               .Replace('D', 'd')
                                               .Replace('Y', 'y');
@@ -176,12 +184,15 @@ public class RolloverFilenameBuilder
             }
         }
 
-        fmt = fmt.Replace("*", ".*", StringComparison.Ordinal);
+        fmt = fmt.Replace("*", ".*?", StringComparison.Ordinal);
         _hideZeroIndex = fmt.Contains("$J", StringComparison.Ordinal);
         fmt = fmt.Replace("$I", "(?'index'[\\d]+)", StringComparison.Ordinal);
-        fmt = fmt.Replace("$J", "(?'index'[\\d]*)", StringComparison.Ordinal);
+        var optionalIndexPattern = _condContent != null
+            ? $"(?:(?'cond'{Regex.Escape(_condContent)})(?'index'[\\d]+)|(?'index'))"
+            : "(?'index'[\\d]*)";
+        fmt = fmt.Replace("$J", optionalIndexPattern, StringComparison.Ordinal);
 
-        _regex = new Regex(fmt);
+        _regex = new Regex(@"\A" + fmt + @"\z");
     }
 
     private string EscapeNonvarRegions (string formatString)
@@ -192,6 +203,12 @@ public class RolloverFilenameBuilder
         StringBuilder result = new();
         StringBuilder segment = new();
 
+        void FlushEscaped ()
+        {
+            _ = result.Append(Regex.Escape(segment.ToString()));
+            segment = new StringBuilder();
+        }
+
         for (var i = 0; i < fmt.Length; ++i)
         {
             switch (state)
@@ -199,8 +216,7 @@ public class RolloverFilenameBuilder
                 case 0: // looking for $
                     if (fmt[i] == '$')
                     {
-                        _ = result.Append(Regex.Escape(segment.ToString()));
-                        segment = new StringBuilder();
+                        FlushEscaped();
                         state = 1;
                     }
 
@@ -238,7 +254,7 @@ public class RolloverFilenameBuilder
             }
         }
 
-        _ = result.Append(Regex.Escape(segment.ToString()));
+        FlushEscaped();
         fmt = result.ToString().Replace('\xFFFD', '*');
         return fmt;
     }
