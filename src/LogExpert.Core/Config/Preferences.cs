@@ -79,7 +79,44 @@ public class Preferences
 
     public bool AskForClose { get; set; }
 
-    public bool DarkMode { get; set; }
+    /// <summary>
+    /// Color scheme applied at startup: forced light, forced dark, or follow the Windows theme.
+    /// Takes effect after a restart. Replaces the old bool <c>DarkMode</c> setting (issue #698).
+    /// </summary>
+    public ColorMode ColorMode
+    {
+        get => _colorMode;
+        set
+        {
+            _colorMode = value;
+            _colorModeAssigned = true;
+        }
+    }
+
+    private ColorMode _colorMode = ColorMode.Light;
+
+    private bool _colorModeAssigned;
+
+    /// <summary>
+    /// Legacy property for backward compatibility with old settings files that stored the color scheme as the bool
+    /// "DarkMode". true maps to <see cref="ColorMode.Dark"/>, false to <see cref="ColorMode.Light"/> — an unchecked
+    /// box meant forced light, not follow-OS (issue #698). An explicit <see cref="ColorMode"/> value always wins.
+    /// This setter redirects data on load; the property is never written back.
+    /// </summary>
+    [Obsolete("This property exists only for backward compatibility with old settings files. Use ColorMode instead. This will be removed with version 1.50")]
+    [Newtonsoft.Json.JsonProperty("DarkMode", DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+    [System.Text.Json.Serialization.JsonIgnore]
+    public bool? DarkMode
+    {
+        get => null; // Always return null so Newtonsoft.Json won't serialize this property
+        set
+        {
+            if (!_colorModeAssigned && value.HasValue)
+            {
+                _colorMode = value.Value ? ColorMode.Dark : ColorMode.Light;
+            }
+        }
+    }
 
     [Obsolete("This setting is no longer used and will be removed in version 1.50. The 'UseLegacyReader' now works with ReaderType.Legacy")]
     [System.Text.Json.Serialization.JsonIgnore]

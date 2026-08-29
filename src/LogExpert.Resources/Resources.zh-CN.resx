@@ -760,8 +760,8 @@
   <data name="SettingsDialog_UI_CheckBox_checkBoxAskCloseTabs" xml:space="preserve">
     <value>关闭标签页前询问</value>
   </data>
-  <data name="SettingsDialog_UI_CheckBox_checkBoxDarkMode" xml:space="preserve">
-    <value>深色模式（需重启生效）</value>
+  <data name="SettingsDialog_UI_Label_labelColorMode" xml:space="preserve">
+    <value>颜色模式（需重启生效）</value>
   </data>
   <data name="SettingsDialog_UI_CheckBox_checkBoxFollowTail" xml:space="preserve">
     <value>启用跟随尾部</value>
