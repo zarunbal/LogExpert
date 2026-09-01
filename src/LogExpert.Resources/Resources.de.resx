@@ -1682,7 +1682,7 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
 * = alle Zeichen (wildcard)
 $D(&lt;date&gt;) = Datumsmuster
 $I = Dateiindexnummer
-$J = Dateiindexnummer, versteckt wenn 09
+$J = Dateiindexnummer, versteckt wenn null
 $J(&lt;prefix&gt;) = Wie $J, jedoch wird ein &lt;prefix&gt; hinzugefügt wenn es nicht 0 ist
 
 Beispiele:
