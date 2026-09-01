@@ -26,8 +26,6 @@ internal sealed class LogfileReaderMultiFileFlagTests
 
         File.Copy(Path.Combine(_testDataDirectory, "app.log"), _logFile);
         File.Copy(Path.Combine(_testDataDirectory, "app.log.1"), _logFile + ".1");
-        File.Copy(Path.Combine(_testDataDirectory, "app.1.log"), Path.Combine(_testDirectory, "app.1.log"));
-        File.Copy(Path.Combine(_testDataDirectory, "app.2.log"), Path.Combine(_testDirectory, "app.2.log"));
 
         _ = PluginRegistry.PluginRegistry.Create(_testDirectory, 500);
     }
@@ -74,6 +72,8 @@ internal sealed class LogfileReaderMultiFileFlagTests
     public void SingleFileCtor_MultiFileTrue_LoadsIndexBeforeExtension ()
     {
         var options = new MultiFileOptions { FormatPattern = "*$J(.).log" };
+        File.Copy(Path.Combine(_testDataDirectory, "app.1.log"), Path.Combine(_testDirectory, "app.1.log"));
+        File.Copy(Path.Combine(_testDataDirectory, "app.2.log"), Path.Combine(_testDirectory, "app.2.log"));
         using var reader = CreateSingleFileReader(multiFile: true, options);
 
         reader.ReadFiles();
