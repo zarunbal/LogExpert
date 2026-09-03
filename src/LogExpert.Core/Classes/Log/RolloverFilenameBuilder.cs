@@ -28,7 +28,6 @@ public class RolloverFilenameBuilder
     #region Fields
 
     private string _condContent;
-    private Group _condGroup;
     private string _currentFileName;
 
     private Group _dateGroup;
@@ -41,6 +40,7 @@ public class RolloverFilenameBuilder
 
     private bool _hideZeroIndex;
     private Group _indexGroup;
+    private Group _indexPartGroup;
     private Regex _regex;
 
     #endregion
@@ -89,7 +89,7 @@ public class RolloverFilenameBuilder
                 Index = _indexGroup.Value.Length > 0 ? int.Parse(_indexGroup.Value) : 0;
             }
 
-            _condGroup = match.Groups["cond"];
+            _indexPartGroup = match.Groups["indexPart"];
         }
     }
 
@@ -116,23 +116,15 @@ public class RolloverFilenameBuilder
 
         if (_indexGroup != null && _indexGroup.Success)
         {
-            var indexPosition = _indexGroup.Index;
-            var indexLength = _indexGroup.Length;
-            if (_condGroup != null && _condGroup.Success)
-            {
-                indexPosition = _condGroup.Index;
-                indexLength += _condGroup.Length;
-            }
+            fileName = fileName.Remove(_indexPartGroup.Index, _indexPartGroup.Length);
 
-            fileName = fileName.Remove(indexPosition, indexLength);
-
-            if (!_hideZeroIndex || Index > 0)
+            if (Index > 0 || (!_hideZeroIndex && _indexGroup.Length > 0))
             {
                 var format = "D" + _indexGroup.Length;
-                fileName = fileName.Insert(indexPosition, Index.ToString(format));
+                fileName = fileName.Insert(_indexPartGroup.Index, Index.ToString(format));
                 if (_hideZeroIndex && _condContent != null)
                 {
-                    fileName = fileName.Insert(indexPosition, _condContent);
+                    fileName = fileName.Insert(_indexPartGroup.Index, _condContent);
                 }
             }
         }
@@ -186,13 +178,14 @@ public class RolloverFilenameBuilder
 
         fmt = fmt.Replace("*", ".*?", StringComparison.Ordinal);
         _hideZeroIndex = fmt.Contains("$J", StringComparison.Ordinal);
-        fmt = fmt.Replace("$I", "(?'index'[\\d]+)", StringComparison.Ordinal);
-        var optionalIndexPattern = _condContent != null
-            ? $"(?:(?'cond'{Regex.Escape(_condContent)})(?'index'[\\d]+)|(?'index'))"
-            : "(?'index'[\\d]*)";
-        fmt = fmt.Replace("$J", optionalIndexPattern, StringComparison.Ordinal);
+        const string indexPattern = "(?'indexPart'(?'index'[\\d]*))";
+        var conditionalIndexPattern = _condContent != null
+            ? $"(?'indexPart'(?:{Regex.Escape(_condContent)}(?'index'[\\d]+)|(?'index')))"
+            : indexPattern;
+        fmt = fmt.Replace("$I", indexPattern, StringComparison.Ordinal);
+        fmt = fmt.Replace("$J", conditionalIndexPattern, StringComparison.Ordinal);
 
-        _regex = new Regex(@"\A" + fmt + @"\z");
+        _regex = new Regex(fmt + @"\z");
     }
 
     private string EscapeNonvarRegions (string formatString)
@@ -203,12 +196,6 @@ public class RolloverFilenameBuilder
         StringBuilder result = new();
         StringBuilder segment = new();
 
-        void FlushEscaped ()
-        {
-            _ = result.Append(Regex.Escape(segment.ToString()));
-            segment = new StringBuilder();
-        }
-
         for (var i = 0; i < fmt.Length; ++i)
         {
             switch (state)
@@ -216,7 +203,7 @@ public class RolloverFilenameBuilder
                 case 0: // looking for $
                     if (fmt[i] == '$')
                     {
-                        FlushEscaped();
+                        AppendEscapedSegment(result, segment);
                         state = 1;
                     }
 
@@ -224,8 +211,7 @@ public class RolloverFilenameBuilder
                     break;
                 case 1: // the char behind $
                     _ = segment.Append(fmt[i]);
-                    _ = result.Append(segment);
-                    segment = new StringBuilder();
+                    AppendSegment(result, segment);
                     state = 2;
                     break;
                 case 2: // checking if ( or other char
@@ -245,8 +231,7 @@ public class RolloverFilenameBuilder
                     _ = segment.Append(fmt[i]);
                     if (fmt[i] == ')')
                     {
-                        _ = result.Append(segment);
-                        segment = new StringBuilder();
+                        AppendSegment(result, segment);
                         state = 0;
                     }
 
@@ -254,9 +239,21 @@ public class RolloverFilenameBuilder
             }
         }
 
-        FlushEscaped();
+        AppendEscapedSegment(result, segment);
         fmt = result.ToString().Replace('\xFFFD', '*');
         return fmt;
+    }
+
+    private static void AppendEscapedSegment (StringBuilder result, StringBuilder segment)
+    {
+        _ = result.Append(Regex.Escape(segment.ToString()));
+        _ = segment.Clear();
+    }
+
+    private static void AppendSegment (StringBuilder result, StringBuilder segment)
+    {
+        _ = result.Append(segment);
+        _ = segment.Clear();
     }
 
     #endregion
