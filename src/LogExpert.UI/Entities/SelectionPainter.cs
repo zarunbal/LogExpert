@@ -37,10 +37,26 @@ internal static class SelectionPainter
         var previousColumn = grid.Columns.GetPreviousColumn(grid.Columns[column], DataGridViewElementStates.Visible, DataGridViewElementStates.None);
         var nextColumn = grid.Columns.GetNextColumn(grid.Columns[column], DataGridViewElementStates.Visible, DataGridViewElementStates.None);
         var edges = SelectionEdges.None;
-        if (previousRow < 0 || !grid[column, previousRow].Selected) { edges |= SelectionEdges.Top; }
-        if (nextRow < 0 || !grid[column, nextRow].Selected) { edges |= SelectionEdges.Bottom; }
-        if (previousColumn == null || !grid[previousColumn.Index, row].Selected) { edges |= SelectionEdges.Left; }
-        if (nextColumn == null || !grid[nextColumn.Index, row].Selected) { edges |= SelectionEdges.Right; }
+        if (previousRow < 0 || !grid[column, previousRow].Selected)
+        {
+            edges |= SelectionEdges.Top;
+        }
+
+        if (nextRow < 0 || !grid[column, nextRow].Selected)
+        {
+            edges |= SelectionEdges.Bottom;
+        }
+
+        if (previousColumn == null || !grid[previousColumn.Index, row].Selected)
+        {
+            edges |= SelectionEdges.Left;
+        }
+
+        if (nextColumn == null || !grid[nextColumn.Index, row].Selected)
+        {
+            edges |= SelectionEdges.Right;
+        }
+
         return edges;
     }
 
@@ -64,23 +80,50 @@ internal static class SelectionPainter
             {
                 foreach (DataGridViewColumn column in grid.Columns)
                 {
-                    if (!column.Visible) { continue; }
+                    if (!column.Visible)
+                    {
+                        continue;
+                    }
+
                     var bounds = grid.GetCellDisplayRectangle(column.Index, row, false);
                     var visible = grid.GetCellDisplayRectangle(column.Index, row, true);
-                    if (visible.IsEmpty || !visible.IntersectsWith(e.ClipRectangle)) { continue; }
+                    if (visible.IsEmpty || !visible.IntersectsWith(e.ClipRectangle))
+                    {
+                        continue;
+                    }
+
                     var edges = GetOutlineEdges(grid, row, column.Index);
-                    if (edges == SelectionEdges.None) { continue; }
+                    if (edges == SelectionEdges.None)
+                    {
+                        continue;
+                    }
 
                     e.Graphics.SetClip(Rectangle.Intersect(visible, e.ClipRectangle), CombineMode.Replace);
+
                     var inset = pen.Width / 2;
                     var left = bounds.Left + inset;
                     var right = bounds.Right - inset;
                     var top = bounds.Top + inset;
                     var bottom = bounds.Bottom - inset;
-                    if (edges.HasFlag(SelectionEdges.Top)) { e.Graphics.DrawLine(pen, bounds.Left, top, bounds.Right, top); }
-                    if (edges.HasFlag(SelectionEdges.Bottom)) { e.Graphics.DrawLine(pen, bounds.Left, bottom, bounds.Right, bottom); }
-                    if (edges.HasFlag(SelectionEdges.Left)) { e.Graphics.DrawLine(pen, left, bounds.Top, left, bounds.Bottom); }
-                    if (edges.HasFlag(SelectionEdges.Right)) { e.Graphics.DrawLine(pen, right, bounds.Top, right, bounds.Bottom); }
+                    if (edges.HasFlag(SelectionEdges.Top))
+                    {
+                        e.Graphics.DrawLine(pen, bounds.Left, top, bounds.Right, top);
+                    }
+
+                    if (edges.HasFlag(SelectionEdges.Bottom))
+                    {
+                        e.Graphics.DrawLine(pen, bounds.Left, bottom, bounds.Right, bottom);
+                    }
+
+                    if (edges.HasFlag(SelectionEdges.Left))
+                    {
+                        e.Graphics.DrawLine(pen, left, bounds.Top, left, bounds.Bottom);
+                    }
+
+                    if (edges.HasFlag(SelectionEdges.Right))
+                    {
+                        e.Graphics.DrawLine(pen, right, bounds.Top, right, bounds.Bottom);
+                    }
                 }
             }
         }
@@ -100,7 +143,11 @@ internal readonly record struct SelectionCellStyle (bool FillBackground, Color B
 
     public bool PaintBackground (DataGridViewCellPaintingEventArgs e)
     {
-        if (!FillBackground) { return false; }
+        if (!FillBackground)
+        {
+            return false;
+        }
+
         using var brush = new SolidBrush(Background);
         e.Graphics.FillRectangle(brush, e.CellBounds);
         return true;
