@@ -4,6 +4,8 @@
 PackageIdentifier: LogExperts.LogExpert
 PackageVersion: 1.40.3
 InstallerType: inno
+Scope: machine
+ProductCode: '{9C6E17B8-912C-45F9-9E7F-49CEAD8D6D7A}_is1'
 Dependencies:
   PackageDependencies:
   - PackageIdentifier: Microsoft.DotNet.DesktopRuntime.10
@@ -13,4 +15,4 @@ Installers:
   InstallerSha256: f32bde3703da1db0c1a963d37ee0eeab029bb18cbe3b8730ea12eda0eaafe2fa
 ManifestType: installer
 ManifestVersion: 1.10.0
-ReleaseDate: 2026-06-12
+ReleaseDate: 2026-06-15
