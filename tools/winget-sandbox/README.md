@@ -42,4 +42,4 @@ winget uninstall --product-code '{9C6E17B8-912C-45F9-9E7F-49CEAD8D6D7A}_is1' --s
 This is a clean installation test, not an upgrade test. Once the first version is
 accepted into `microsoft/winget-pkgs`, also test upgrading from it before relying on
 the release automation in PR #614. Submit only the three YAML files from `winget`
-under `manifests/l/LogExperts/LogExpert/1.40.3/` in the community repository.
+under `manifests/l/LogExperts/LogExpert/1.43.0/` in the community repository.
